@@ -46,12 +46,12 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
       - name: Trivy image scan
-        uses: aquasecurity/trivy-action@0.35.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: ghcr.io/resace3/ha-config-pilot:latest
           format: sarif
           output: trivy-release-image.sarif
-          version: v0.69.3
+          version: v0.72.0
       - uses: github/codeql-action/upload-sarif@v3
         if: always()
         with:
