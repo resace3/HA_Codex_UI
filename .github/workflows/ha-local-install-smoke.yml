@@ -28,4 +28,5 @@ jobs:
         if: always()
         run: |
           echo "### Home Assistant local install smoke" >> "$GITHUB_STEP_SUMMARY"
-          echo "Required structure and container health checks ran. Full Supervisor install is reported only when the runner supports it." >> "$GITHUB_STEP_SUMMARY"
+          echo "Required structure and container health checks ran." >> "$GITHUB_STEP_SUMMARY"
+          echo "Full Supervisor install is reported only when the runner supports it." >> "$GITHUB_STEP_SUMMARY"

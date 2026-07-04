@@ -33,14 +33,34 @@ jobs:
           set -euo pipefail
           grep -F "execution is intentionally delegated to GitHub Actions" README.md
           grep -F "Do not run tests, builds, Docker, devcontainers, package installers, or generated scripts locally" AGENTS.md
-          if grep -RInE 'nektos/act|(^|[[:space:]])act[[:space:]-]' .github README.md AGENTS.md SECURITY.md ha_codex_ui/DOCS.md ha_codex_ui/README.md | grep -v '.github/workflows/actions-remote-only.yml'; then
+          act_pattern='nektos/act|(^|[[:space:]])act[[:space:]-]'
+          scan_paths=(
+            .github
+            README.md
+            AGENTS.md
+            SECURITY.md
+            ha_codex_ui/DOCS.md
+            ha_codex_ui/README.md
+          )
+          if grep -RInE "${act_pattern}" "${scan_paths[@]}" \
+            | grep -v '.github/workflows/actions-remote-only.yml'; then
             echo "Found unsupported local Actions runner reference."
             exit 1
           fi
       - name: Check docs do not instruct local heavy execution
         run: |
           set -euo pipefail
-          if grep -RInE '(^|[[:space:]])(npm install|npm ci|npm test|npm run build|docker build|docker run|docker compose|devcontainer up|pytest|vitest|playwright test)([[:space:]]|$)' README.md AGENTS.md SECURITY.md ha_codex_ui/README.md ha_codex_ui/DOCS.md .devcontainer/README.md; then
+          heavy_pattern='(^|[[:space:]])(npm install|npm ci|npm test|npm run build|docker build|'
+          heavy_pattern+='docker run|docker compose|devcontainer up|pytest|vitest|playwright test)([[:space:]]|$)'
+          docs_paths=(
+            README.md
+            AGENTS.md
+            SECURITY.md
+            ha_codex_ui/README.md
+            ha_codex_ui/DOCS.md
+            .devcontainer/README.md
+          )
+          if grep -RInE "${heavy_pattern}" "${docs_paths[@]}"; then
             echo "Documentation must not instruct local heavy execution."
             exit 1
           fi

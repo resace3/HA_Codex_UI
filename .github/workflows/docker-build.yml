@@ -21,7 +21,11 @@ jobs:
       - uses: actions/checkout@v4
       - uses: docker/setup-buildx-action@v3
       - name: Build amd64 image
-        run: docker buildx build --load --platform linux/amd64 --build-arg CODEX_STUB=1 -t ghcr.io/resace3/ha-codex-ui:ci -f ha_codex_ui/Dockerfile ha_codex_ui
+        run: |
+          docker buildx build --load --platform linux/amd64 \
+            --build-arg CODEX_STUB=1 \
+            -t ghcr.io/resace3/ha-codex-ui:ci \
+            -f ha_codex_ui/Dockerfile ha_codex_ui
       - name: Docker smoke
         run: bash scripts/smoke-docker-image.sh
       - name: Trivy image scan

@@ -141,4 +141,5 @@ jobs:
       - name: Write summary
         run: |
           echo "### HA_Codex_UI CI summary" >> "$GITHUB_STEP_SUMMARY"
-          echo "Repository, add-on, backend, frontend, PTY, file manager, browser, Docker, security, devcontainer, and Home Assistant smoke workflows were scheduled." >> "$GITHUB_STEP_SUMMARY"
+          echo "Repository, add-on, backend, frontend, PTY, file manager," >> "$GITHUB_STEP_SUMMARY"
+          echo "browser, Docker, security, devcontainer, and Home Assistant smoke workflows were scheduled." >> "$GITHUB_STEP_SUMMARY"
