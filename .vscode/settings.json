@@ -1,8 +1,8 @@
 {
   "editor.formatOnSave": true,
-  "typescript.tsdk": "config_pilot/frontend/node_modules/typescript/lib",
+  "typescript.tsdk": "ha_codex_ui/frontend/node_modules/typescript/lib",
   "eslint.workingDirectories": [
-    "config_pilot/backend",
-    "config_pilot/frontend"
+    "ha_codex_ui/backend",
+    "ha_codex_ui/frontend"
   ]
 }

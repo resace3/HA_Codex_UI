@@ -5,7 +5,7 @@ if [ "${GITHUB_ACTIONS:-}" != "true" ]; then
 fi
 
 set -euo pipefail
-mkdir -p /tmp/config-pilot-ha
+mkdir -p /tmp/ha-codex-ui-ha
 echo "Attempting Home Assistant development startup only as a GitHub Actions diagnostic."
 if command -v docker >/dev/null 2>&1; then
   docker version

@@ -9,7 +9,7 @@ if os.environ.get("GITHUB_ACTIONS") != "true":
     sys.exit(2)
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-CONFIG = ROOT / "config_pilot" / "config.yaml"
+CONFIG = ROOT / "ha_codex_ui" / "config.yaml"
 REPOSITORY = ROOT / "repository.yaml"
 
 
@@ -32,12 +32,12 @@ for key in ["name:", "url:", "maintainer:"]:
         fail(f"repository.yaml missing {key}")
 
 required_pairs = {
-    "name: Config Pilot": "display name",
-    "slug: config_pilot": "slug",
+    "name: HA_Codex_UI": "display name",
+    "slug: ha_codex_ui": "slug",
     "version: 0.1.0": "version",
     "ingress: true": "ingress",
     "ingress_port: 8107": "ingress port",
-    "panel_title: Config Pilot": "panel title",
+    "panel_title: HA_Codex_UI": "panel title",
     "init: false": "init flag",
 }
 
@@ -65,13 +65,13 @@ for key in dangerous:
         fail(f"dangerous key present: {key}")
 
 for required in [
-    "config_pilot/Dockerfile",
-    "config_pilot/run.sh",
-    "config_pilot/apparmor.txt",
-    "config_pilot/README.md",
-    "config_pilot/DOCS.md",
-    "config_pilot/icon.svg",
-    "config_pilot/logo.svg",
+    "ha_codex_ui/Dockerfile",
+    "ha_codex_ui/run.sh",
+    "ha_codex_ui/apparmor.txt",
+    "ha_codex_ui/README.md",
+    "ha_codex_ui/DOCS.md",
+    "ha_codex_ui/icon.svg",
+    "ha_codex_ui/logo.svg",
 ]:
     if not (ROOT / required).exists():
         fail(f"missing {required}")
@@ -85,4 +85,4 @@ if "allow_config_write: false" not in config:
 if "schema:" not in config:
     fail("schema missing")
 
-print("Config Pilot add-on metadata validated.")
+print("HA_Codex_UI add-on metadata validated.")

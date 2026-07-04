@@ -21,13 +21,13 @@ jobs:
       - uses: actions/checkout@v4
       - uses: docker/setup-buildx-action@v3
       - name: Build amd64 image
-        run: docker buildx build --load --platform linux/amd64 --build-arg CODEX_STUB=1 -t ghcr.io/resace3/ha-config-pilot:ci -f config_pilot/Dockerfile config_pilot
+        run: docker buildx build --load --platform linux/amd64 --build-arg CODEX_STUB=1 -t ghcr.io/resace3/ha-codex-ui:ci -f ha_codex_ui/Dockerfile ha_codex_ui
       - name: Docker smoke
         run: bash scripts/smoke-docker-image.sh
       - name: Trivy image scan
         uses: aquasecurity/trivy-action@v0.36.0
         with:
-          image-ref: ghcr.io/resace3/ha-config-pilot:ci-smoke
+          image-ref: ghcr.io/resace3/ha-codex-ui:ci-smoke
           format: sarif
           output: trivy-image.sarif
           version: v0.72.0
@@ -39,5 +39,5 @@ jobs:
         if: failure()
         with:
           name: docker-smoke-logs
-          path: /tmp/config-pilot-*/container.log
+          path: /tmp/ha-codex-ui-*/container.log
           if-no-files-found: ignore

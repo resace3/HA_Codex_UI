@@ -1,7 +1,7 @@
-config_pilot_fixture:
-  alias: Config Pilot fixture script
+ha_codex_ui_fixture:
+  alias: HA_Codex_UI fixture script
   sequence:
     - service: logbook.log
       data:
-        name: Config Pilot
+        name: HA_Codex_UI
         message: Fixture script executed.

@@ -25,6 +25,6 @@ __pycache__/
 .pnpm-store/
 .yarn/
 .npm/
-config_pilot/backend/package-lock.generated.json
-config_pilot/frontend/package-lock.generated.json
+ha_codex_ui/backend/package-lock.generated.json
+ha_codex_ui/frontend/package-lock.generated.json
 test-fixtures/**/secrets.yaml

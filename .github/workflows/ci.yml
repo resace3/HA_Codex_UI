@@ -48,7 +48,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: config_pilot/backend
+        working-directory: ha_codex_ui/backend
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -64,7 +64,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: config_pilot/frontend
+        working-directory: ha_codex_ui/frontend
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -81,7 +81,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: config_pilot/backend
+        working-directory: ha_codex_ui/backend
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -95,7 +95,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: config_pilot/backend
+        working-directory: ha_codex_ui/backend
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -139,5 +139,5 @@ jobs:
     steps:
       - name: Write summary
         run: |
-          echo "### Config Pilot CI summary" >> "$GITHUB_STEP_SUMMARY"
+          echo "### HA_Codex_UI CI summary" >> "$GITHUB_STEP_SUMMARY"
           echo "Repository, add-on, backend, frontend, PTY, file manager, browser, Docker, security, devcontainer, and Home Assistant smoke workflows were scheduled." >> "$GITHUB_STEP_SUMMARY"

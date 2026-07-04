@@ -2,49 +2,49 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Config Pilot: CI all",
+      "label": "HA_Codex_UI: CI all",
       "type": "shell",
       "command": "bash -lc 'if [ \"${GITHUB_ACTIONS:-}\" != \"true\" ]; then echo \"This task is intended to run only in GitHub Actions. It did not run locally.\"; exit 2; fi; bash scripts/ci-all.sh'",
       "problemMatcher": []
     },
     {
-      "label": "Config Pilot: build add-on image",
+      "label": "HA_Codex_UI: build add-on image",
       "type": "shell",
       "command": "bash -lc 'if [ \"${GITHUB_ACTIONS:-}\" != \"true\" ]; then echo \"This task is intended to run only in GitHub Actions. It did not run locally.\"; exit 2; fi; bash scripts/smoke-docker-image.sh'",
       "problemMatcher": []
     },
     {
-      "label": "Config Pilot: backend dev",
+      "label": "HA_Codex_UI: backend dev",
       "type": "shell",
-      "command": "bash -lc 'if [ \"${GITHUB_ACTIONS:-}\" != \"true\" ]; then echo \"This task is intended to run only in GitHub Actions. It did not run locally.\"; exit 2; fi; cd config_pilot/backend && npm run build'",
+      "command": "bash -lc 'if [ \"${GITHUB_ACTIONS:-}\" != \"true\" ]; then echo \"This task is intended to run only in GitHub Actions. It did not run locally.\"; exit 2; fi; cd ha_codex_ui/backend && npm run build'",
       "problemMatcher": []
     },
     {
-      "label": "Config Pilot: frontend dev",
+      "label": "HA_Codex_UI: frontend dev",
       "type": "shell",
-      "command": "bash -lc 'if [ \"${GITHUB_ACTIONS:-}\" != \"true\" ]; then echo \"This task is intended to run only in GitHub Actions. It did not run locally.\"; exit 2; fi; cd config_pilot/frontend && npm run build'",
+      "command": "bash -lc 'if [ \"${GITHUB_ACTIONS:-}\" != \"true\" ]; then echo \"This task is intended to run only in GitHub Actions. It did not run locally.\"; exit 2; fi; cd ha_codex_ui/frontend && npm run build'",
       "problemMatcher": []
     },
     {
-      "label": "Config Pilot: Playwright",
+      "label": "HA_Codex_UI: Playwright",
       "type": "shell",
-      "command": "bash -lc 'if [ \"${GITHUB_ACTIONS:-}\" != \"true\" ]; then echo \"This task is intended to run only in GitHub Actions. It did not run locally.\"; exit 2; fi; cd config_pilot/frontend && npm run e2e'",
+      "command": "bash -lc 'if [ \"${GITHUB_ACTIONS:-}\" != \"true\" ]; then echo \"This task is intended to run only in GitHub Actions. It did not run locally.\"; exit 2; fi; cd ha_codex_ui/frontend && npm run e2e'",
       "problemMatcher": []
     },
     {
-      "label": "Config Pilot: Home Assistant smoke",
+      "label": "HA_Codex_UI: Home Assistant smoke",
       "type": "shell",
       "command": "bash -lc 'if [ \"${GITHUB_ACTIONS:-}\" != \"true\" ]; then echo \"This task is intended to run only in GitHub Actions. It did not run locally.\"; exit 2; fi; bash scripts/smoke-ha-local-install.sh'",
       "problemMatcher": []
     },
     {
-      "label": "Config Pilot: name collision check",
+      "label": "HA_Codex_UI: name collision check",
       "type": "shell",
       "command": "bash -lc 'if [ \"${GITHUB_ACTIONS:-}\" != \"true\" ]; then echo \"This task is intended to run only in GitHub Actions. It did not run locally.\"; exit 2; fi; bash scripts/check-name-collisions.sh'",
       "problemMatcher": []
     },
     {
-      "label": "Config Pilot: start Home Assistant diagnostic",
+      "label": "HA_Codex_UI: start Home Assistant diagnostic",
       "type": "shell",
       "command": "bash -lc 'if [ \"${GITHUB_ACTIONS:-}\" != \"true\" ]; then echo \"This task is intended to run only in GitHub Actions. It did not run locally.\"; exit 2; fi; bash .devcontainer/start-home-assistant.sh'",
       "problemMatcher": []

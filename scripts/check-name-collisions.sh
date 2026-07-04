@@ -9,6 +9,11 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "${ROOT}"
 
 forbidden=(
+  "Config Pilot"
+  "config_pilot"
+  "config-pilot"
+  "ha-config-pilot"
+  "ghcr.io/resace3/ha-config-pilot"
   "Codex Studio"
   "ha-codex-studio"
   "codex_studio"
@@ -21,8 +26,8 @@ tmp="$(mktemp)"
 find . \
   -path ./.git -prune -o \
   -path ./node_modules -prune -o \
-  -path ./config_pilot/backend/node_modules -prune -o \
-  -path ./config_pilot/frontend/node_modules -prune -o \
+  -path ./ha_codex_ui/backend/node_modules -prune -o \
+  -path ./ha_codex_ui/frontend/node_modules -prune -o \
   -type f -print > "${tmp}"
 
 failures=0
@@ -33,13 +38,17 @@ while IFS= read -r file; do
       ;;
   esac
   for name in "${forbidden[@]}"; do
-    if grep -FIn -- "${name}" "${file}" >/tmp/config-pilot-name-hit 2>/dev/null; then
+    if [[ "${file}" == *"${name}"* ]]; then
+      echo "Forbidden old project name found in path ${file}: ${name}"
+      failures=1
+    fi
+    if grep -FIn -- "${name}" "${file}" >/tmp/ha-codex-ui-name-hit 2>/dev/null; then
       echo "Forbidden old project name found in ${file}: ${name}"
-      cat /tmp/config-pilot-name-hit
+      cat /tmp/ha-codex-ui-name-hit
       failures=1
     fi
   done
 done < "${tmp}"
 
-rm -f "${tmp}" /tmp/config-pilot-name-hit
+rm -f "${tmp}" /tmp/ha-codex-ui-name-hit
 exit "${failures}"

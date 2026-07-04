@@ -1,12 +1,12 @@
 {
-  "name": "Config Pilot CI Devcontainer",
+  "name": "HA_Codex_UI CI Devcontainer",
   "build": {
     "dockerfile": "Dockerfile",
     "context": ".."
   },
-  "workspaceFolder": "/workspaces/ha-config-pilot",
+  "workspaceFolder": "/workspaces/ha-codex-ui",
   "containerEnv": {
-    "CONFIG_PILOT_DIRECT_ACCESS": "1",
+    "HA_CODEX_UI_DIRECT_ACCESS": "1",
     "PORT": "8107"
   },
   "remoteEnv": {
@@ -26,7 +26,7 @@
   "forwardPorts": [8107],
   "portsAttributes": {
     "8107": {
-      "label": "Config Pilot"
+      "label": "HA_Codex_UI"
     }
   }
 }

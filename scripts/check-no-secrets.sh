@@ -12,8 +12,8 @@ tmp="$(mktemp)"
 find . \
   -path ./.git -prune -o \
   -path ./node_modules -prune -o \
-  -path ./config_pilot/backend/node_modules -prune -o \
-  -path ./config_pilot/frontend/node_modules -prune -o \
+  -path ./ha_codex_ui/backend/node_modules -prune -o \
+  -path ./ha_codex_ui/frontend/node_modules -prune -o \
   -type f -print > "${tmp}"
 
 failures=0
@@ -23,9 +23,9 @@ while IFS= read -r file; do
       continue
       ;;
   esac
-  if grep -En 'sk-[A-Za-z0-9_-]{20,}|gh[pousr]_[A-Za-z0-9_]{20,}|-----BEGIN [A-Z ]*PRIVATE KEY-----|"refresh_token"[[:space:]]*:|"access_token"[[:space:]]*:|SUPERVISOR_TOKEN=.+' "${file}" >/tmp/config-pilot-secret-hit 2>/dev/null; then
+  if grep -En 'sk-[A-Za-z0-9_-]{20,}|gh[pousr]_[A-Za-z0-9_]{20,}|-----BEGIN [A-Z ]*PRIVATE KEY-----|"refresh_token"[[:space:]]*:|"access_token"[[:space:]]*:|SUPERVISOR_TOKEN=.+' "${file}" >/tmp/ha-codex-ui-secret-hit 2>/dev/null; then
     echo "Potential secret in ${file}"
-    cat /tmp/config-pilot-secret-hit
+    cat /tmp/ha-codex-ui-secret-hit
     failures=1
   fi
   if [[ "${file}" == *"/secrets.yaml" ]]; then
@@ -33,5 +33,5 @@ while IFS= read -r file; do
     failures=1
   fi
 done < "${tmp}"
-rm -f "${tmp}" /tmp/config-pilot-secret-hit
+rm -f "${tmp}" /tmp/ha-codex-ui-secret-hit
 exit "${failures}"

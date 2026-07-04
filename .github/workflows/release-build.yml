@@ -35,12 +35,12 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/resace3/ha-config-pilot
+          images: ghcr.io/resace3/ha-codex-ui
       - name: Build and publish multi-arch image
         uses: docker/build-push-action@v6
         with:
-          context: config_pilot
-          file: config_pilot/Dockerfile
+          context: ha_codex_ui
+          file: ha_codex_ui/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
@@ -48,7 +48,7 @@ jobs:
       - name: Trivy image scan
         uses: aquasecurity/trivy-action@v0.36.0
         with:
-          image-ref: ghcr.io/resace3/ha-config-pilot:latest
+          image-ref: ghcr.io/resace3/ha-codex-ui:latest
           format: sarif
           output: trivy-release-image.sarif
           version: v0.72.0
@@ -58,5 +58,5 @@ jobs:
           sarif_file: trivy-release-image.sarif
       - name: Release summary
         run: |
-          echo "### Config Pilot release" >> "$GITHUB_STEP_SUMMARY"
-          echo "Published GHCR image ghcr.io/resace3/ha-config-pilot when the release workflow succeeded." >> "$GITHUB_STEP_SUMMARY"
+          echo "### HA_Codex_UI release" >> "$GITHUB_STEP_SUMMARY"
+          echo "Published GHCR image ghcr.io/resace3/ha-codex-ui when the release workflow succeeded." >> "$GITHUB_STEP_SUMMARY"

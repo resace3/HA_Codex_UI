@@ -36,7 +36,7 @@ jobs:
       - name: hadolint
         uses: hadolint/hadolint-action@v3.1.0
         with:
-          dockerfile: config_pilot/Dockerfile
+          dockerfile: ha_codex_ui/Dockerfile
       - name: yamllint
         run: |
           python3 -m pip install yamllint
@@ -46,12 +46,12 @@ jobs:
           npm install -g markdownlint-cli2
           markdownlint-cli2 "**/*.md"
       - name: Backend npm audit
-        working-directory: config_pilot/backend
+        working-directory: ha_codex_ui/backend
         run: |
           npm install --package-lock-only
           npm audit --audit-level=high
       - name: Frontend npm audit
-        working-directory: config_pilot/frontend
+        working-directory: ha_codex_ui/frontend
         run: |
           npm install --package-lock-only
           npm audit --audit-level=high

@@ -6,7 +6,7 @@ fi
 
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-cd "${ROOT}/config_pilot/backend"
+cd "${ROOT}/ha_codex_ui/backend"
 
 npm install --package-lock-only
 npm ci
@@ -14,17 +14,17 @@ npm run build
 
 tmp="$(mktemp -d)"
 trap 'kill "${server_pid:-0}" 2>/dev/null || true; rm -rf "${tmp}"' EXIT
-mkdir -p "${tmp}/data" "${tmp}/share/config_pilot_workspace" "${tmp}/share/config_pilot_uploads"
+mkdir -p "${tmp}/data" "${tmp}/share/ha_codex_ui_workspace" "${tmp}/share/ha_codex_ui_uploads"
 cat > "${tmp}/options.json" <<JSON
 {
-  "default_workspace": "${tmp}/share/config_pilot_workspace",
-  "upload_workspace": "${tmp}/share/config_pilot_uploads",
-  "allowed_workspaces": ["${tmp}/share/config_pilot_workspace", "${tmp}/share/config_pilot_uploads"],
-  "app_data_dir": "${tmp}/data/config_pilot",
-  "codex_home": "${tmp}/data/config_pilot/.codex"
+  "default_workspace": "${tmp}/share/ha_codex_ui_workspace",
+  "upload_workspace": "${tmp}/share/ha_codex_ui_uploads",
+  "allowed_workspaces": ["${tmp}/share/ha_codex_ui_workspace", "${tmp}/share/ha_codex_ui_uploads"],
+  "app_data_dir": "${tmp}/data/ha_codex_ui",
+  "codex_home": "${tmp}/data/ha_codex_ui/.codex"
 }
 JSON
-CONFIG_PILOT_OPTIONS="${tmp}/options.json" CONFIG_PILOT_DIRECT_ACCESS=1 PORT=8107 node dist/index.js > "${tmp}/backend.log" 2>&1 &
+HA_CODEX_UI_OPTIONS="${tmp}/options.json" HA_CODEX_UI_DIRECT_ACCESS=1 PORT=8107 node dist/index.js > "${tmp}/backend.log" 2>&1 &
 server_pid="$!"
 for _ in $(seq 1 60); do
   if curl -fsS http://127.0.0.1:8107/api/health >/dev/null; then

@@ -2,7 +2,7 @@
 
 ## Threat Model
 
-Config Pilot gives authenticated Home Assistant users browser access to file management, text editing, terminals, and Codex CLI sessions. The main risks are unauthorized access, accidental modification of Home Assistant configuration, secret exposure, terminal misuse, path traversal, symlink escape, unsafe downloads, and leaked Codex or Home Assistant tokens.
+HA_Codex_UI gives authenticated Home Assistant users browser access to file management, text editing, terminals, and Codex CLI sessions. The main risks are unauthorized access, accidental modification of Home Assistant configuration, secret exposure, terminal misuse, path traversal, symlink escape, unsafe downloads, and leaked Codex or Home Assistant tokens.
 
 ## Terminal Risk
 
@@ -10,7 +10,7 @@ Terminals can run arbitrary shell commands. The default add-on mapping keeps `/c
 
 ## Codex Risk
 
-Codex can edit files and run commands in the selected workspace. Config Pilot stores Codex state under `/data/config_pilot/.codex`, sets restrictive permissions, blocks direct browser access to that folder, and never displays auth file contents.
+Codex can edit files and run commands in the selected workspace. HA_Codex_UI stores Codex state under `/data/ha_codex_ui/.codex`, sets restrictive permissions, blocks direct browser access to that folder, and never displays auth file contents.
 
 ## Sensitive Files
 
@@ -18,7 +18,7 @@ The path policy blocks:
 
 - Path traversal and absolute path escape.
 - Symlink escape.
-- `/data/config_pilot/.codex`.
+- `/data/ha_codex_ui/.codex`.
 - Codex auth files.
 - SSH and GnuPG state.
 - Browser credential stores.
@@ -34,7 +34,7 @@ Report vulnerabilities privately to Nick Rezaee at `resace3@gmail.com`. Include 
 ## If Codex Auth Leaks
 
 1. Stop the add-on.
-2. Remove affected files under `/data/config_pilot/.codex`.
+2. Remove affected files under `/data/ha_codex_ui/.codex`.
 3. Revoke or rotate any impacted OpenAI credentials through the provider account.
 4. Restart the add-on.
 5. Sign in again through a Codex terminal.
@@ -59,7 +59,7 @@ Logs redact bearer tokens, OpenAI-style keys, Home Assistant tokens, refresh tok
 
 ## Why `/config` Is Read-Only By Default
 
-An app-level save policy cannot constrain arbitrary terminal commands inside a read-write mount. The default read-only `/config` mapping ensures shell and Codex access cannot silently bypass Config Pilot write checks for the primary Home Assistant configuration folder.
+An app-level save policy cannot constrain arbitrary terminal commands inside a read-write mount. The default read-only `/config` mapping ensures shell and Codex access cannot silently bypass HA_Codex_UI write checks for the primary Home Assistant configuration folder.
 
 ## Local Execution Firewall
 

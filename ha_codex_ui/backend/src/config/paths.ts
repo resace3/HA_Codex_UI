@@ -1,0 +1,10 @@
+export const SERVICE_NAME = "ha-codex-ui";
+export const ADDON_VERSION = "0.1.0";
+export const DEFAULT_PORT = 8107;
+export const DEFAULT_DATA_DIR = "/data/ha_codex_ui";
+export const DEFAULT_CODEX_HOME = "/data/ha_codex_ui/.codex";
+export const DEFAULT_SESSIONS_DIR = "/data/ha_codex_ui/sessions";
+export const DEFAULT_SNAPSHOTS_DIR = "/data/ha_codex_ui/snapshots";
+export const DEFAULT_WORKSPACE = "/share/ha_codex_ui_workspace";
+export const DEFAULT_UPLOAD_WORKSPACE = "/share/ha_codex_ui_uploads";
+export const FRONTEND_DIST_DIR = process.env.HA_CODEX_UI_FRONTEND_DIR ?? "/opt/ha-codex-ui/frontend";

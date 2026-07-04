@@ -8,4 +8,4 @@ set -euo pipefail
 node --version
 npm --version
 python3 --version
-echo "Config Pilot devcontainer post-create checks completed in GitHub Actions."
+echo "HA_Codex_UI devcontainer post-create checks completed in GitHub Actions."

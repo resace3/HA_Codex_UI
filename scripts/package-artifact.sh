@@ -9,5 +9,5 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "${ROOT}"
 
 mkdir -p artifacts
-tar --exclude='.git' --exclude='node_modules' --exclude='dist' -czf artifacts/config-pilot-addon.tar.gz repository.yaml config_pilot
-echo "Packaged artifacts/config-pilot-addon.tar.gz"
+tar --exclude='.git' --exclude='node_modules' --exclude='dist' -czf artifacts/ha-codex-ui-addon.tar.gz repository.yaml ha_codex_ui
+echo "Packaged artifacts/ha-codex-ui-addon.tar.gz"

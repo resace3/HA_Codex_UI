@@ -1,8 +1,12 @@
-# Config Pilot
+# HA_Codex_UI
 
-Config Pilot is a private Home Assistant add-on repository for a secure Ingress web app that provides a browser-based file manager, editor, multi-terminal workspace, Codex CLI launcher, changed-file inspector, diffs, snapshots, diagnostics, and Home Assistant-focused guardrails.
+HA_Codex_UI is a private Home Assistant add-on repository for a secure Ingress web app that provides a browser-based file manager, editor, multi-terminal workspace, Codex CLI launcher, changed-file inspector, diffs, snapshots, diagnostics, and Home Assistant-focused guardrails.
 
-Terminals and Codex sessions are powerful. They can run commands and modify any workspace that is mounted read-write. The default add-on configuration keeps `/config`, `/addons`, and `/backup` read-only, and uses `/share/config_pilot_workspace` plus `/share/config_pilot_uploads` for write workflows.
+Terminals and Codex sessions are powerful. They can run commands and modify any workspace that is mounted read-write. The default add-on configuration keeps `/config`, `/addons`, and `/backup` read-only, and uses `/share/ha_codex_ui_workspace` plus `/share/ha_codex_ui_uploads` for write workflows.
+
+[![Open your Home Assistant instance and add this add-on repository](https://my.home-assistant.io/badges/supervisor_add_addon_repository.svg)](https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A%2F%2Fgithub.com%2Fresace3%2FHA_Codex_UI)
+
+The button opens your Home Assistant instance and pre-fills this repository URL. For a private repository, make sure your Home Assistant device can access `https://github.com/resace3/HA_Codex_UI`.
 
 ## Local Execution Policy
 
@@ -32,31 +36,33 @@ Generated scripts in `scripts/` and `.devcontainer/` refuse to run unless `GITHU
 
 ## Screenshots
 
-Screenshots are produced by the browser rendering workflow and uploaded as GitHub Actions artifacts when failures occur. Stable product screenshots can be added after the first verified remote run.
+![HA_Codex_UI browser workspace](docs/images/ha-codex-ui-screenshot.svg)
+
+Browser rendering workflows also upload screenshots and traces as GitHub Actions artifacts when failures occur.
 
 ## Install Option 1: Private GitHub Add-on Repository
 
-1. Push this repository to the private GitHub repository `resace3/ha-config-pilot`.
+1. Push this repository to the private GitHub repository `resace3/HA_Codex_UI`.
 2. Make sure the Home Assistant installation can access the private repository.
-3. Add the repository URL in the Home Assistant add-on store.
-4. Install **Config Pilot**.
+3. Click the button above, or add the repository URL in the Home Assistant add-on store.
+4. Install **HA_Codex_UI**.
 5. Review add-on options.
 6. Start the add-on.
-7. Open **Config Pilot** from the Home Assistant sidebar.
+7. Open **HA_Codex_UI** from the Home Assistant sidebar.
 
 Repository URL:
 
 ```text
-https://github.com/resace3/ha-config-pilot
+https://github.com/resace3/HA_Codex_UI
 ```
 
 ## Install Option 2: Verified Actions Artifacts
 
 1. GitHub Actions builds and validates artifacts remotely.
 2. Download verified artifacts from the Actions run.
-3. Copy the verified `config_pilot` add-on folder into a Home Assistant local add-ons directory.
+3. Copy the verified `ha_codex_ui` add-on folder into a Home Assistant local add-ons directory.
 4. Reload the Home Assistant add-on store.
-5. Install local **Config Pilot**.
+5. Install local **HA_Codex_UI**.
 6. Start the add-on.
 7. Open it from the sidebar.
 
@@ -71,8 +77,8 @@ https://github.com/resace3/ha-config-pilot
 
 | Option | Default | Notes |
 | --- | --- | --- |
-| `default_workspace` | `/share/config_pilot_workspace` | Main writable workspace. |
-| `upload_workspace` | `/share/config_pilot_uploads` | Default upload target. |
+| `default_workspace` | `/share/ha_codex_ui_workspace` | Main writable workspace. |
+| `upload_workspace` | `/share/ha_codex_ui_uploads` | Default upload target. |
 | `allowed_workspaces` | Workspace, uploads, `/config` | Only configured roots are visible. |
 | `allow_config_write` | `false` | Keeps `/config` read-only by default. |
 | `allow_addons_write` | `false` | Keeps `/addons` read-only. |
@@ -85,12 +91,12 @@ https://github.com/resace3/ha-config-pilot
 | `max_terminal_sessions` | `8` | Live terminal cap. |
 | `terminal_idle_timeout_minutes` | `120` | Idle cleanup window. |
 | `codex_install_mode` | `bundled` | Runtime image includes Codex CLI. |
-| `codex_home` | `/data/config_pilot/.codex` | Isolated Codex state. |
+| `codex_home` | `/data/ha_codex_ui/.codex` | Isolated Codex state. |
 | `create_snapshot_before_write` | `true` | Captures snapshots before app writes. |
 
 ## Workspaces
 
-Config Pilot only serves configured absolute workspace roots. Missing default and upload workspaces are created at startup when policy allows it. Sensitive roots such as `/config`, `/addons`, and `/backup` are marked sensitive and read-only by default.
+HA_Codex_UI only serves configured absolute workspace roots. Missing default and upload workspaces are created at startup when policy allows it. Sensitive roots such as `/config`, `/addons`, and `/backup` are marked sensitive and read-only by default.
 
 ## Uploads And Downloads
 
@@ -101,23 +107,23 @@ Uploads stream to a temporary file before rename, enforce size limits, and requi
 Shell terminals launch `bash` in the selected workspace. Codex terminals launch `codex` with:
 
 ```text
-CODEX_HOME=/data/config_pilot/.codex
-HOME=/data/config_pilot
+CODEX_HOME=/data/ha_codex_ui/.codex
+HOME=/data/ha_codex_ui
 ```
 
 Terminal output is streamed to the browser. Raw terminal logs are not persisted by default.
 
 ## Codex Authentication
 
-Config Pilot never asks for an OpenAI username or password and never displays Codex auth file contents. Sign in through a Codex terminal session. If authentication files are detected, the UI reports only a safe state such as `likely_authenticated`.
+HA_Codex_UI never asks for an OpenAI username or password and never displays Codex auth file contents. Sign in through a Codex terminal session. If authentication files are detected, the UI reports only a safe state such as `likely_authenticated`.
 
 ## Diffs And Snapshots
 
-Git workspaces use `git status` and `git diff`. Non-git workspaces can use snapshots under `/data/config_pilot/snapshots`. Snapshots skip `.git`, `node_modules`, secrets, large files, binary files, and Codex state.
+Git workspaces use `git status` and `git diff`. Non-git workspaces can use snapshots under `/data/ha_codex_ui/snapshots`. Snapshots skip `.git`, `node_modules`, secrets, large files, binary files, and Codex state.
 
 ## Home Assistant Checks
 
-YAML parsing is supported for selected files. Full Home Assistant configuration checks return `supported: false` unless a safe supported endpoint or command exists in the add-on context. Config Pilot does not fake success.
+YAML parsing is supported for selected files. Full Home Assistant configuration checks return `supported: false` unless a safe supported endpoint or command exists in the add-on context. HA_Codex_UI does not fake success.
 
 ## Mobile Notes
 
@@ -142,7 +148,7 @@ The workflow suite covers repository validation, add-on metadata validation, bac
 
 ## Release Process
 
-Releases are built in GitHub Actions. The release workflow validates the add-on, runs safety checks, builds multi-arch images, publishes `ghcr.io/resace3/ha-config-pilot`, and uploads scan results where supported.
+Releases are built in GitHub Actions. The release workflow validates the add-on, runs safety checks, builds multi-arch images, publishes `ghcr.io/resace3/ha-codex-ui`, and uploads scan results where supported.
 
 ## Troubleshooting
 
@@ -162,9 +168,9 @@ Releases are built in GitHub Actions. The release workflow validates the add-on,
 - Do not expose this add-on publicly.
 - `armv7` support would require additional testing.
 - Codex CLI install methods may change over time.
-- Config Pilot naming is intentional to avoid conflicts with a separate similar add-on.
+- HA_Codex_UI naming is intentional to avoid conflicts with a separate similar add-on.
 - Initial lockfiles may need GitHub Actions bootstrap because local package manager execution is disabled.
 
 ## Name Collision Avoidance
 
-The repository includes a dedicated scanner that prevents accidental reintroduction of legacy project naming outside the scanner itself. Product, package, add-on, image, and documentation names should remain Config Pilot, `config_pilot`, `config-pilot`, and `ghcr.io/resace3/ha-config-pilot` as appropriate.
+The repository includes a dedicated scanner that prevents accidental reintroduction of legacy project naming outside the scanner itself. Product, package, add-on, image, and documentation names should remain HA_Codex_UI, `ha_codex_ui`, `ha-codex-ui`, and `ghcr.io/resace3/ha-codex-ui` as appropriate.

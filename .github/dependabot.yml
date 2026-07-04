@@ -1,7 +1,7 @@
 version: 2
 updates:
   - package-ecosystem: npm
-    directory: /config_pilot/backend
+    directory: /ha_codex_ui/backend
     schedule:
       interval: weekly
     groups:
@@ -10,7 +10,7 @@ updates:
           - minor
           - patch
   - package-ecosystem: npm
-    directory: /config_pilot/frontend
+    directory: /ha_codex_ui/frontend
     schedule:
       interval: weekly
     groups:
@@ -28,6 +28,6 @@ updates:
           - minor
           - patch
   - package-ecosystem: docker
-    directory: /config_pilot
+    directory: /ha_codex_ui
     schedule:
       interval: weekly

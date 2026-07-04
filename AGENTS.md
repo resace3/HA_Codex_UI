@@ -1,6 +1,6 @@
 # AGENTS.md
 
-This repository is a Home Assistant add-on named **Config Pilot**.
+This repository is a Home Assistant add-on named **HA_Codex_UI**.
 
 ## Non-Negotiable Rules
 
@@ -18,7 +18,7 @@ This repository is a Home Assistant add-on named **Config Pilot**.
 - Do not run tests, builds, Docker, devcontainers, package installers, or generated scripts locally.
 - Let GitHub Actions run all execution.
 - Do not rename the app back to old conflicting names.
-- Keep slug as `config_pilot` unless a migration is documented.
+- Keep slug as `ha_codex_ui` unless a migration is documented.
 
 ## Local Work Policy
 
@@ -26,7 +26,7 @@ Local work is limited to creating files, editing files, deleting files created b
 
 ## Security Expectations
 
-Config Pilot exposes file and terminal access inside Home Assistant. Treat every change as security-sensitive:
+HA_Codex_UI exposes file and terminal access inside Home Assistant. Treat every change as security-sensitive:
 
 - Path resolution must stay rooted inside configured workspaces.
 - Symlink escape must stay blocked.

@@ -13,6 +13,6 @@ python3 - <<'PY'
 from pathlib import Path
 root = Path("test-fixtures/generated")
 root.mkdir(parents=True, exist_ok=True)
-(root / "large-text.txt").write_text("Config Pilot fixture\n" * 10000, encoding="utf-8")
+(root / "large-text.txt").write_text("HA_Codex_UI fixture\n" * 10000, encoding="utf-8")
 PY
 echo "Generated non-secret test fixtures."

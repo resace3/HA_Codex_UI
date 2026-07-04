@@ -24,7 +24,7 @@ jobs:
           python3 -m pip install --user PyYAML
           python3 - <<'PY'
           import pathlib, yaml
-          for path in [pathlib.Path("repository.yaml"), pathlib.Path("config_pilot/config.yaml")]:
+          for path in [pathlib.Path("repository.yaml"), pathlib.Path("ha_codex_ui/config.yaml")]:
               yaml.safe_load(path.read_text())
               print(f"valid yaml: {path}")
           PY
@@ -36,8 +36,8 @@ jobs:
       - name: Check required files
         run: |
           set -euo pipefail
-          for f in repository.yaml config_pilot/config.yaml config_pilot/Dockerfile config_pilot/run.sh config_pilot/apparmor.txt config_pilot/README.md config_pilot/DOCS.md; do
+          for f in repository.yaml ha_codex_ui/config.yaml ha_codex_ui/Dockerfile ha_codex_ui/run.sh ha_codex_ui/apparmor.txt ha_codex_ui/README.md ha_codex_ui/DOCS.md; do
             test -f "$f"
           done
       - name: Summary
-        run: echo "Config Pilot add-on metadata validation completed." >> "$GITHUB_STEP_SUMMARY"
+        run: echo "HA_Codex_UI add-on metadata validation completed." >> "$GITHUB_STEP_SUMMARY"

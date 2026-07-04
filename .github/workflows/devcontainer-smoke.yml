@@ -29,4 +29,4 @@ jobs:
         if: always()
         run: |
           echo "### Devcontainer smoke" >> "$GITHUB_STEP_SUMMARY"
-          echo "Built the Config Pilot devcontainer and attempted CI, add-on detection, Docker, and Home Assistant diagnostics where supported." >> "$GITHUB_STEP_SUMMARY"
+          echo "Built the HA_Codex_UI devcontainer and attempted CI, add-on detection, Docker, and Home Assistant diagnostics where supported." >> "$GITHUB_STEP_SUMMARY"

@@ -1,1 +1,1 @@
-Config Pilot upload fixture.
+HA_Codex_UI upload fixture.

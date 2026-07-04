@@ -5,10 +5,10 @@ if [ "${GITHUB_ACTIONS:-}" != "true" ]; then
 fi
 
 set -euo pipefail
-cd /workspaces/ha-config-pilot
+cd /workspaces/ha-codex-ui
 python3 scripts/validate-addon-metadata.py
 test -f repository.yaml
-test -f config_pilot/config.yaml
-grep -F "slug: config_pilot" config_pilot/config.yaml
-grep -F "ingress_port: 8107" config_pilot/config.yaml
-echo "Config Pilot local add-on structure detected."
+test -f ha_codex_ui/config.yaml
+grep -F "slug: ha_codex_ui" ha_codex_ui/config.yaml
+grep -F "ingress_port: 8107" ha_codex_ui/config.yaml
+echo "HA_Codex_UI local add-on structure detected."

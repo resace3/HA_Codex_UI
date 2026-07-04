@@ -1,0 +1,58 @@
+#include <tunables/global>
+
+profile ha-codex-ui flags=(attach_disconnected,mediate_deleted) {
+  #include <abstractions/base>
+  #include <abstractions/bash>
+  #include <abstractions/nameservice>
+
+  capability chown,
+  capability dac_override,
+  capability fowner,
+  capability setgid,
+  capability setuid,
+
+  deny /dev/mem rwklx,
+  deny /dev/kmem rwklx,
+  deny /proc/sysrq-trigger rwklx,
+  deny /sys/** wklx,
+  deny /var/run/docker.sock rwklx,
+  deny /run/docker.sock rwklx,
+
+  /run.sh ix,
+  /bin/** rix,
+  /usr/bin/** rix,
+  /usr/local/bin/** rix,
+  /opt/ha-codex-ui/** r,
+  /opt/ha-codex-ui/backend/dist/** r,
+  /opt/ha-codex-ui/backend/node_modules/** r,
+  /opt/ha-codex-ui/frontend/** r,
+
+  /data/ha_codex_ui/ rw,
+  /data/ha_codex_ui/** rwk,
+  /share/ha_codex_ui_workspace/ rw,
+  /share/ha_codex_ui_workspace/** rwk,
+  /share/ha_codex_ui_uploads/ rw,
+  /share/ha_codex_ui_uploads/** rwk,
+
+  /config/ r,
+  /config/** r,
+  /addons/ r,
+  /addons/** r,
+  /backup/ r,
+  /backup/** r,
+
+  /tmp/ rw,
+  /tmp/** rwk,
+  /dev/pts/** rw,
+  /dev/ptmx rw,
+  /dev/tty rw,
+  /proc/** r,
+  /proc/*/fd/** rw,
+  /proc/*/stat r,
+
+  network inet stream,
+  network inet6 stream,
+
+  # AppArmor reduces broad host access. HA_Codex_UI still enforces workspace,
+  # path, terminal, upload, and download policy in application code.
+}

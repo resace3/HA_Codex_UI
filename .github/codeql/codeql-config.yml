@@ -1,7 +1,7 @@
-name: Config Pilot CodeQL
+name: HA_Codex_UI CodeQL
 paths:
-  - config_pilot/backend/src
-  - config_pilot/frontend/src
+  - ha_codex_ui/backend/src
+  - ha_codex_ui/frontend/src
 paths-ignore:
   - "**/node_modules/**"
   - "**/dist/**"

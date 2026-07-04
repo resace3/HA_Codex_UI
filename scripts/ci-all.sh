@@ -16,7 +16,7 @@ bash scripts/check-ingress-paths.sh
 bash scripts/check-websocket-proxy.sh
 
 (
-  cd config_pilot/backend
+  cd ha_codex_ui/backend
   npm install --package-lock-only
   npm ci
   npm run lint
@@ -25,7 +25,7 @@ bash scripts/check-websocket-proxy.sh
 )
 
 (
-  cd config_pilot/frontend
+  cd ha_codex_ui/frontend
   npm install --package-lock-only
   npm ci
   npm run lint

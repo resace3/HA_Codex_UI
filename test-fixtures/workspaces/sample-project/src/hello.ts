@@ -1,3 +1,3 @@
 export function helloConfigPilot(): string {
-  return "hello from Config Pilot";
+  return "hello from HA_Codex_UI";
 }

@@ -9,7 +9,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "${ROOT}"
 
 python3 scripts/validate-addon-metadata.py
-docker build --build-arg CODEX_STUB=1 -t ghcr.io/resace3/ha-config-pilot:ha-smoke -f config_pilot/Dockerfile config_pilot
+docker build --build-arg CODEX_STUB=1 -t ghcr.io/resace3/ha-codex-ui:ha-smoke -f ha_codex_ui/Dockerfile ha_codex_ui
 echo "Basic local add-on image build completed in GitHub Actions."
 if command -v ha >/dev/null 2>&1; then
   echo "Home Assistant CLI detected; attempting read-only add-on listing."

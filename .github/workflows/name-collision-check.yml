@@ -17,5 +17,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Run Config Pilot name collision scan
+      - name: Run HA_Codex_UI name collision scan
         run: bash scripts/check-name-collisions.sh

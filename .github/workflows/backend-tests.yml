@@ -17,14 +17,14 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: config_pilot/backend
+        working-directory: ha_codex_ui/backend
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
           cache: npm
-          cache-dependency-path: config_pilot/backend/package-lock.json
+          cache-dependency-path: ha_codex_ui/backend/package-lock.json
       - name: Bootstrap lockfile remotely
         run: npm install --package-lock-only
       - name: Install backend dependencies
@@ -44,5 +44,5 @@ jobs:
         if: always()
         with:
           name: backend-coverage
-          path: config_pilot/backend/coverage
+          path: ha_codex_ui/backend/coverage
           if-no-files-found: ignore

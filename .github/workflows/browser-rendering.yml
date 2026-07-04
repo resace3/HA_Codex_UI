@@ -18,8 +18,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CODEX_STUB: "1"
-      CONFIG_PILOT_DIRECT_ACCESS: "1"
-      CONFIG_PILOT_FRONTEND_DIR: "/tmp/config-pilot-e2e/frontend"
+      HA_CODEX_UI_DIRECT_ACCESS: "1"
+      HA_CODEX_UI_FRONTEND_DIR: "/tmp/ha-codex-ui-e2e/frontend"
       PORT: "8107"
     steps:
       - uses: actions/checkout@v4
@@ -27,13 +27,13 @@ jobs:
         with:
           node-version: "22"
       - name: Install backend
-        working-directory: config_pilot/backend
+        working-directory: ha_codex_ui/backend
         run: |
           npm install --package-lock-only
           npm ci
           npm run build
       - name: Install frontend and browsers
-        working-directory: config_pilot/frontend
+        working-directory: ha_codex_ui/frontend
         run: |
           npm install --package-lock-only
           npm ci
@@ -41,37 +41,37 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Prepare runtime fixtures
         run: |
-          mkdir -p /tmp/config-pilot-e2e/data /tmp/config-pilot-e2e/share/config_pilot_workspace /tmp/config-pilot-e2e/share/config_pilot_uploads
-          cp -R config_pilot/frontend/dist /tmp/config-pilot-e2e/frontend
-          cat > /tmp/config-pilot-e2e/options.json <<JSON
+          mkdir -p /tmp/ha-codex-ui-e2e/data /tmp/ha-codex-ui-e2e/share/ha_codex_ui_workspace /tmp/ha-codex-ui-e2e/share/ha_codex_ui_uploads
+          cp -R ha_codex_ui/frontend/dist /tmp/ha-codex-ui-e2e/frontend
+          cat > /tmp/ha-codex-ui-e2e/options.json <<JSON
           {
-            "default_workspace": "/tmp/config-pilot-e2e/share/config_pilot_workspace",
-            "upload_workspace": "/tmp/config-pilot-e2e/share/config_pilot_uploads",
-            "allowed_workspaces": ["/tmp/config-pilot-e2e/share/config_pilot_workspace", "/tmp/config-pilot-e2e/share/config_pilot_uploads"],
-            "app_data_dir": "/tmp/config-pilot-e2e/data/config_pilot",
-            "codex_home": "/tmp/config-pilot-e2e/data/config_pilot/.codex"
+            "default_workspace": "/tmp/ha-codex-ui-e2e/share/ha_codex_ui_workspace",
+            "upload_workspace": "/tmp/ha-codex-ui-e2e/share/ha_codex_ui_uploads",
+            "allowed_workspaces": ["/tmp/ha-codex-ui-e2e/share/ha_codex_ui_workspace", "/tmp/ha-codex-ui-e2e/share/ha_codex_ui_uploads"],
+            "app_data_dir": "/tmp/ha-codex-ui-e2e/data/ha_codex_ui",
+            "codex_home": "/tmp/ha-codex-ui-e2e/data/ha_codex_ui/.codex"
           }
           JSON
       - name: Start backend
-        working-directory: config_pilot/backend
+        working-directory: ha_codex_ui/backend
         run: |
-          CONFIG_PILOT_OPTIONS=/tmp/config-pilot-e2e/options.json node dist/index.js > /tmp/config-pilot-e2e/backend.log 2>&1 &
-          echo $! > /tmp/config-pilot-e2e/backend.pid
+          HA_CODEX_UI_OPTIONS=/tmp/ha-codex-ui-e2e/options.json node dist/index.js > /tmp/ha-codex-ui-e2e/backend.log 2>&1 &
+          echo $! > /tmp/ha-codex-ui-e2e/backend.pid
           for i in $(seq 1 60); do
             curl -fsS http://127.0.0.1:8107/api/health && exit 0
             sleep 1
           done
-          cat /tmp/config-pilot-e2e/backend.log
+          cat /tmp/ha-codex-ui-e2e/backend.log
           exit 1
       - name: Run Playwright
-        working-directory: config_pilot/frontend
+        working-directory: ha_codex_ui/frontend
         run: npm run e2e
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: browser-rendering-artifacts
           path: |
-            config_pilot/frontend/playwright-report
-            config_pilot/frontend/test-results
-            /tmp/config-pilot-e2e/backend.log
+            ha_codex_ui/frontend/playwright-report
+            ha_codex_ui/frontend/test-results
+            /tmp/ha-codex-ui-e2e/backend.log
           if-no-files-found: ignore

@@ -1,5 +1,5 @@
 homeassistant:
-  name: Config Pilot Fixture
+  name: HA_Codex_UI Fixture
   country: US
   time_zone: Etc/UTC
 

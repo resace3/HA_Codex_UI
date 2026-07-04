@@ -8,12 +8,12 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "${ROOT}"
 
-image="ghcr.io/resace3/ha-config-pilot:ci-smoke"
+image="ghcr.io/resace3/ha-codex-ui:ci-smoke"
 tmp="$(mktemp -d)"
-container="config-pilot-smoke-${GITHUB_RUN_ID:-manual}"
+container="ha-codex-ui-smoke-${GITHUB_RUN_ID:-manual}"
 trap 'docker logs "${container}" > "${tmp}/container.log" 2>&1 || true; docker rm -f "${container}" >/dev/null 2>&1 || true; rm -rf "${tmp}"' EXIT
 mkdir -p "${tmp}/data" "${tmp}/share" "${tmp}/config"
-docker build --build-arg CODEX_STUB=1 -t "${image}" -f config_pilot/Dockerfile config_pilot
+docker build --build-arg CODEX_STUB=1 -t "${image}" -f ha_codex_ui/Dockerfile ha_codex_ui
 docker run -d --name "${container}" -p 8107:8107 -v "${tmp}/data:/data" -v "${tmp}/share:/share" -v "${tmp}/config:/config:ro" "${image}"
 for _ in $(seq 1 90); do
   if curl -fsS http://127.0.0.1:8107/api/health >/dev/null; then
@@ -46,5 +46,5 @@ socket.addEventListener("message", (event) => {
 NODE
 curl -fsS -X POST "http://127.0.0.1:8107/api/terminals/${terminal_id}/stop"
 docker exec "${container}" test -x /run.sh
-docker exec "${container}" stat -c '%a' /data/config_pilot/.codex | grep -E '^700$'
+docker exec "${container}" stat -c '%a' /data/ha_codex_ui/.codex | grep -E '^700$'
 echo "Docker image smoke completed."

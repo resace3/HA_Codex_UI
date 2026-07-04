@@ -8,9 +8,9 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "${ROOT}"
 
-grep -R "/api/terminals/:id/ws" config_pilot/backend/src/server/routes >/dev/null
-grep -R "WebSocketServer" config_pilot/backend/src/server/websocket.ts >/dev/null
-grep -R '"ping"' config_pilot/backend/src >/dev/null
-grep -R '"pong"' config_pilot/backend/src >/dev/null
-grep -R "stripIngressPrefix" config_pilot/backend/src/server/websocket.ts >/dev/null
+grep -R "/api/terminals/:id/ws" ha_codex_ui/backend/src/server/routes >/dev/null
+grep -R "WebSocketServer" ha_codex_ui/backend/src/server/websocket.ts >/dev/null
+grep -R '"ping"' ha_codex_ui/backend/src >/dev/null
+grep -R '"pong"' ha_codex_ui/backend/src >/dev/null
+grep -R "stripIngressPrefix" ha_codex_ui/backend/src/server/websocket.ts >/dev/null
 echo "WebSocket proxy checks passed."

@@ -1,11 +1,11 @@
-- id: config_pilot_fixture_light
-  alias: Config Pilot fixture automation
+- id: ha_codex_ui_fixture_light
+  alias: HA_Codex_UI fixture automation
   trigger:
     - platform: state
-      entity_id: input_boolean.config_pilot_fixture
+      entity_id: input_boolean.ha_codex_ui_fixture
       to: "on"
   action:
     - service: logbook.log
       data:
-        name: Config Pilot
+        name: HA_Codex_UI
         message: Fixture automation triggered.
