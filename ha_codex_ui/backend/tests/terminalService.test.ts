@@ -3,6 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import { defaultOptions } from "../src/config/addonOptions.js";
 import { TerminalService } from "../src/services/terminalService.js";
+import type { TerminalModel } from "../src/types/terminal.js";
 import type { Workspace } from "../src/types/workspace.js";
 
 describe("TerminalService", () => {
@@ -45,14 +46,31 @@ describe("TerminalService", () => {
   });
 
   it("marks persisted sessions exited after backend restart", async () => {
-    const terminal = await service.create({ type: "shell", workspaceId: "test" }, workspace, true);
-    await service.stop(terminal.id);
+    const sessionsDir = path.join(root, ".data", "sessions");
+    await fs.promises.mkdir(sessionsDir, { recursive: true });
+    const persisted: TerminalModel = {
+      id: "persisted-session",
+      name: "Persisted",
+      type: "shell",
+      workspaceId: "test",
+      cwd: root,
+      createdAt: new Date().toISOString(),
+      lastActiveAt: new Date().toISOString(),
+      status: "running",
+      cols: 120,
+      rows: 30,
+    };
+    await fs.promises.writeFile(
+      path.join(sessionsDir, `${persisted.id}.json`),
+      JSON.stringify(persisted, null, 2),
+      "utf8",
+    );
     const reloaded = new TerminalService({
       ...defaultOptions(),
       app_data_dir: path.join(root, ".data"),
       codex_home: path.join(root, ".data", ".codex"),
     });
     await reloaded.loadPersistedMetadata();
-    expect(reloaded.list()[0]?.status).toBe("exited");
+    expect(reloaded.get(persisted.id).status).toBe("exited");
   });
 });
