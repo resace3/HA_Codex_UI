@@ -17,6 +17,11 @@ type Props = {
 export default function EditorPanel({ file, value, dirty, onChange, onSave }: Props) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const viewRef = useRef<EditorView | null>(null);
+  const onChangeRef = useRef(onChange);
+
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
 
   useEffect(() => {
     if (!containerRef.current || file?.binary) {
@@ -26,7 +31,7 @@ export default function EditorPanel({ file, value, dirty, onChange, onSave }: Pr
       EditorView.lineWrapping,
       EditorView.updateListener.of((update) => {
         if (update.docChanged) {
-          onChange(update.state.doc.toString());
+          onChangeRef.current(update.state.doc.toString());
         }
       }),
       file?.name.endsWith(".ts") || file?.name.endsWith(".js") ? javascript() : yaml(),
@@ -40,7 +45,7 @@ export default function EditorPanel({ file, value, dirty, onChange, onSave }: Pr
       view.destroy();
       viewRef.current = null;
     };
-  }, [file?.path]);
+  }, [file?.binary, file?.name, file?.path]);
 
   useEffect(() => {
     const view = viewRef.current;

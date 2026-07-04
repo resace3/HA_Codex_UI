@@ -127,7 +127,7 @@ describe("utility and small component coverage", () => {
         <FileTree entries={entries} onOpenFile={openFile} onOpenFolder={openFolder} />
       </>,
     );
-    await user.selectOptions(screen.getByLabelText(/Workspace/), "config");
+    await user.selectOptions(screen.getByRole("combobox"), "config");
     await user.click(screen.getByText("folder"));
     await user.click(screen.getByText("config.yaml"));
     expect(workspaceChange).toHaveBeenCalledWith("config");

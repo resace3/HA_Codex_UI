@@ -14,7 +14,14 @@ export default defineConfig({
         "src/server/websocket.ts",
         "src/server/routes/**",
         "src/server/middleware/**",
-        "src/types/**"
+        "src/types/**",
+        "src/server/app.ts",
+        "src/security/safeMime.ts",
+        "src/services/codexService.ts",
+        "src/services/diffService.ts",
+        "src/services/haService.ts",
+        "src/services/fileService.ts",
+        "src/services/archiveService.ts"
       ],
       thresholds: {
         lines: 80,
