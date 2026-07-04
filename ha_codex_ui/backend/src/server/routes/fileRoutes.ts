@@ -51,13 +51,13 @@ export function registerFileRoutes(
   app.get("/api/files/tree", async (request) => {
     const input = query(request, fileQuerySchema);
     const workspace = await workspaceService.getWorkspace(input.workspaceId);
-    return ok(await fileService.tree(workspace, input.path));
+    return ok(await fileService.tree(workspace, input.path ?? "."));
   });
 
   app.get("/api/files/read", async (request) => {
     const input = query(request, fileQuerySchema);
     const workspace = await workspaceService.getWorkspace(input.workspaceId);
-    return ok(await fileService.readText(workspace, input.path));
+    return ok(await fileService.readText(workspace, input.path ?? "."));
   });
 
   app.put("/api/files/write", async (request) => {
@@ -100,7 +100,7 @@ export function registerFileRoutes(
   app.get("/api/files/download", async (request, reply) => {
     const input = query(request, fileQuerySchema);
     const workspace = await workspaceService.getWorkspace(input.workspaceId);
-    const resolved = fileService.resolveDownload(workspace, input.path);
+    const resolved = fileService.resolveDownload(workspace, input.path ?? ".");
     const stat = await fs.promises.stat(resolved);
     if (!stat.isFile()) {
       throw new SafeError("NOT_A_FILE", "Only files can be downloaded from this endpoint.", 400);
@@ -113,7 +113,7 @@ export function registerFileRoutes(
   app.get("/api/files/download-zip", async (request, reply) => {
     const input = query(request, fileQuerySchema);
     const workspace = await workspaceService.getWorkspace(input.workspaceId);
-    const resolved = fileService.resolveDownload(workspace, input.path);
+    const resolved = fileService.resolveDownload(workspace, input.path ?? ".");
     await archiveService.streamZip(workspace, resolved, reply);
     return reply;
   });

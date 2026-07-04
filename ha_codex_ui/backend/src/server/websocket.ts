@@ -10,12 +10,13 @@ export function attachWebSocketServer(app: FastifyInstance, terminalService: Ter
   app.server.on("upgrade", (request: IncomingMessage, socket: Socket, head: Buffer) => {
     const normalizedUrl = stripIngressPrefix(request.url ?? "", request.headers);
     const match = normalizedUrl.match(/\/api\/terminals\/([^/]+)\/ws(?:\?.*)?$/);
-    if (!match?.[1]) {
+    const terminalId = match?.[1];
+    if (!terminalId) {
       socket.destroy();
       return;
     }
     wss.handleUpgrade(request, socket, head, (ws) => {
-      terminalService.attachWebSocket(decodeURIComponent(match[1]), ws);
+      terminalService.attachWebSocket(decodeURIComponent(terminalId), ws);
     });
   });
   return wss;

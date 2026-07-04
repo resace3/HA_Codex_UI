@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import simpleGit from "simple-git";
+import { simpleGit } from "simple-git";
 import type { AddonOptions } from "../config/addonOptions.js";
 import { SafeError } from "../types/api.js";
 import type { Workspace } from "../types/workspace.js";

@@ -54,7 +54,7 @@ export class FileService {
         const resolved = path.join(root, entry.name);
         const entryStat = await fs.promises.lstat(resolved);
         const relative = path.relative(workspace.root, resolved) || ".";
-        const type = entry.isDirectory() ? "directory" : entry.isFile() ? "file" : entry.isSymbolicLink() ? "symlink" : "other";
+        const type: FileTreeEntry["type"] = entry.isDirectory() ? "directory" : entry.isFile() ? "file" : entry.isSymbolicLink() ? "symlink" : "other";
         const sensitive = !this.canRead(workspace, resolved);
         return {
           name: entry.name,

@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import Fastify from "fastify";
+import Fastify, { type FastifyBaseLogger } from "fastify";
 import multipart from "@fastify/multipart";
 import staticPlugin from "@fastify/static";
 import type { AddonOptions } from "../config/addonOptions.js";
@@ -64,7 +64,7 @@ export function createServices(options: AddonOptions): AppServices {
 
 export async function buildApp(options: AddonOptions, services = createServices(options)) {
   const app = Fastify({
-    loggerInstance: createLogger(options.log_level),
+    loggerInstance: createLogger(options.log_level) as FastifyBaseLogger,
     bodyLimit: options.max_upload_mb * 1024 * 1024,
   });
   registerErrorHandler(app);
