@@ -1,0 +1,21 @@
+name: Name Collision Check
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: name-collision-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  name-collision:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Config Pilot name collision scan
+        run: bash scripts/check-name-collisions.sh

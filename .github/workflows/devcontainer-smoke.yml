@@ -1,0 +1,32 @@
+name: Devcontainer Smoke
+
+on:
+  workflow_call:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: devcontainer-smoke-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  devcontainer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and run devcontainer
+        uses: devcontainers/ci@v0.3
+        with:
+          runCmd: |
+            bash scripts/ci-all.sh
+            bash .devcontainer/smoke-install-addon.sh
+            bash .devcontainer/start-home-assistant.sh
+      - name: Summary
+        if: always()
+        run: |
+          echo "### Devcontainer smoke" >> "$GITHUB_STEP_SUMMARY"
+          echo "Built the Config Pilot devcontainer and attempted CI, add-on detection, Docker, and Home Assistant diagnostics where supported." >> "$GITHUB_STEP_SUMMARY"

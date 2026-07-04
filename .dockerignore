@@ -1,0 +1,13 @@
+.git
+.github
+.devcontainer
+.vscode
+node_modules
+coverage
+dist
+playwright-report
+test-results
+*.log
+.env
+.env.*
+test-fixtures/**/secrets.yaml

@@ -1,0 +1,8 @@
+{
+  "result": "ok",
+  "data": {
+    "supervisor": "2026.05.0",
+    "homeassistant": "2026.5.4",
+    "arch": "amd64"
+  }
+}

@@ -1,0 +1,43 @@
+name: Add-on Validation
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: addon-validation-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate repository and add-on metadata
+        run: python3 scripts/validate-addon-metadata.py
+      - name: Validate YAML syntax
+        run: |
+          python3 -m pip install --user PyYAML
+          python3 - <<'PY'
+          import pathlib, yaml
+          for path in [pathlib.Path("repository.yaml"), pathlib.Path("config_pilot/config.yaml")]:
+              yaml.safe_load(path.read_text())
+              print(f"valid yaml: {path}")
+          PY
+      - name: Check guarded scripts and names
+        run: |
+          bash scripts/check-name-collisions.sh
+          bash scripts/check-ingress-paths.sh
+          bash scripts/check-websocket-proxy.sh
+      - name: Check required files
+        run: |
+          set -euo pipefail
+          for f in repository.yaml config_pilot/config.yaml config_pilot/Dockerfile config_pilot/run.sh config_pilot/apparmor.txt config_pilot/README.md config_pilot/DOCS.md; do
+            test -f "$f"
+          done
+      - name: Summary
+        run: echo "Config Pilot add-on metadata validation completed." >> "$GITHUB_STEP_SUMMARY"

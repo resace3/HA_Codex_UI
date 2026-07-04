@@ -1,0 +1,66 @@
+# syntax=docker/dockerfile:1.7
+
+FROM node:22-bookworm-slim AS frontend-build
+WORKDIR /build/frontend
+COPY frontend/package.json frontend/package-lock.json ./
+RUN npm install --package-lock-only && npm ci
+COPY frontend/ ./
+RUN npm run build
+
+FROM node:22-bookworm-slim AS backend-build
+WORKDIR /build/backend
+COPY backend/package.json backend/package-lock.json ./
+RUN npm install --package-lock-only && npm ci
+COPY backend/ ./
+RUN npm run build && npm prune --omit=dev
+
+FROM node:22-bookworm-slim AS runtime
+
+LABEL org.opencontainers.image.title="Config Pilot" \
+  org.opencontainers.image.description="Home Assistant add-on for secure browser file management, terminals, and Codex CLI sessions." \
+  org.opencontainers.image.source="https://github.com/resace3/ha-config-pilot" \
+  org.opencontainers.image.licenses="MIT"
+
+ARG CODEX_STUB=0
+ENV NODE_ENV=production \
+  PORT=8107 \
+  CONFIG_PILOT_DATA=/data/config_pilot \
+  CODEX_HOME=/data/config_pilot/.codex \
+  HOME=/data/config_pilot
+
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
+    bash \
+    ca-certificates \
+    curl \
+    git \
+    gzip \
+    jq \
+    openssh-client \
+    python3 \
+    tar \
+    unzip \
+    zip \
+  && rm -rf /var/lib/apt/lists/*
+
+RUN if [ "${CODEX_STUB}" = "1" ]; then \
+      printf '%s\n' '#!/usr/bin/env bash' 'echo "Codex stub ready"' > /usr/local/bin/codex \
+      && chmod 0755 /usr/local/bin/codex; \
+    else \
+      npm install -g @openai/codex \
+      && codex --version; \
+    fi
+
+WORKDIR /opt/config-pilot
+COPY --from=backend-build /build/backend/dist ./backend/dist
+COPY --from=backend-build /build/backend/node_modules ./backend/node_modules
+COPY --from=backend-build /build/backend/package.json ./backend/package.json
+COPY --from=frontend-build /build/frontend/dist ./frontend
+COPY run.sh /run.sh
+
+RUN mkdir -p /data/config_pilot/.codex /data/config_pilot/sessions /data/config_pilot/snapshots /share/config_pilot_workspace /share/config_pilot_uploads \
+  && chmod 0700 /data/config_pilot/.codex \
+  && chmod 0755 /run.sh
+
+EXPOSE 8107
+ENTRYPOINT ["/run.sh"]

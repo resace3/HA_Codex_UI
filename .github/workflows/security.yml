@@ -1,0 +1,77 @@
+name: Security
+
+on:
+  workflow_call:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+
+concurrency:
+  group: security-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  static-security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Custom secret and name scans
+        run: |
+          bash scripts/check-no-secrets.sh
+          bash scripts/check-name-collisions.sh
+      - name: Guarded scripts
+        run: bash scripts/assert-github-actions-only.sh
+      - name: gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: ShellCheck
+        uses: ludeeus/action-shellcheck@master
+        with:
+          scandir: "."
+      - name: hadolint
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: config_pilot/Dockerfile
+      - name: yamllint
+        run: |
+          python3 -m pip install yamllint
+          yamllint .
+      - name: markdownlint
+        run: |
+          npm install -g markdownlint-cli2
+          markdownlint-cli2 "**/*.md"
+      - name: Backend npm audit
+        working-directory: config_pilot/backend
+        run: |
+          npm install --package-lock-only
+          npm audit --audit-level=high
+      - name: Frontend npm audit
+        working-directory: config_pilot/frontend
+        run: |
+          npm install --package-lock-only
+          npm audit --audit-level=high
+      - name: Trivy filesystem scan
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          format: sarif
+          output: trivy-fs.sarif
+      - uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: trivy-fs.sarif
+  codeql:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: github/codeql-action/init@v3
+        with:
+          languages: javascript-typescript
+          config-file: ./.github/codeql/codeql-config.yml
+      - uses: github/codeql-action/analyze@v3

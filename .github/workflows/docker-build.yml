@@ -1,0 +1,42 @@
+name: Docker Build
+
+on:
+  workflow_call:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+
+concurrency:
+  group: docker-build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Build amd64 image
+        run: docker buildx build --load --platform linux/amd64 --build-arg CODEX_STUB=1 -t ghcr.io/resace3/ha-config-pilot:ci -f config_pilot/Dockerfile config_pilot
+      - name: Docker smoke
+        run: bash scripts/smoke-docker-image.sh
+      - name: Trivy image scan
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: ghcr.io/resace3/ha-config-pilot:ci-smoke
+          format: sarif
+          output: trivy-image.sarif
+      - uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: trivy-image.sarif
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: docker-smoke-logs
+          path: /tmp/config-pilot-*/container.log
+          if-no-files-found: ignore

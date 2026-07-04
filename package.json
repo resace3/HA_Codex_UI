@@ -1,0 +1,10 @@
+{
+  "name": "ha-config-pilot",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Home Assistant add-on repository for Config Pilot.",
+  "license": "MIT",
+  "scripts": {
+    "ci:remote-only": "echo \"Use GitHub Actions for execution in this project.\" && exit 2"
+  }
+}

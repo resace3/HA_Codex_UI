@@ -1,0 +1,9 @@
+homeassistant:
+  name: Config Pilot Fixture
+  country: US
+  time_zone: Etc/UTC
+
+default_config:
+
+automation: !include automations.yaml
+script: !include scripts.yaml

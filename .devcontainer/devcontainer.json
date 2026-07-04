@@ -1,0 +1,29 @@
+{
+  "name": "Config Pilot CI Devcontainer",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "workspaceFolder": "/workspaces/ha-config-pilot",
+  "containerEnv": {
+    "CONFIG_PILOT_DIRECT_ACCESS": "1",
+    "PORT": "8107"
+  },
+  "postCreateCommand": "bash .devcontainer/postCreateCommand.sh",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "github.vscode-github-actions",
+        "ms-azuretools.vscode-docker"
+      ]
+    }
+  },
+  "forwardPorts": [8107],
+  "portsAttributes": {
+    "8107": {
+      "label": "Config Pilot"
+    }
+  }
+}

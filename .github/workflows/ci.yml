@@ -1,0 +1,143 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  repository-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 scripts/validate-addon-metadata.py
+  remote-only:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: bash scripts/assert-github-actions-only.sh
+      - run: |
+          required='if [ "${GITHUB_ACTIONS:-}" != "true" ]; then'
+          while IFS= read -r script; do
+            grep -Fq "${required}" "${script}" || { echo "missing guard: ${script}"; exit 1; }
+          done < <(find scripts .devcontainer -name '*.sh' -type f | sort)
+  name-collision:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: bash scripts/check-name-collisions.sh
+  addon-validation:
+    needs: [repository-validation, remote-only, name-collision]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 scripts/validate-addon-metadata.py
+      - run: bash scripts/check-ingress-paths.sh
+      - run: bash scripts/check-websocket-proxy.sh
+  backend-tests:
+    needs: addon-validation
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: config_pilot/backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm install --package-lock-only
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+  frontend-tests:
+    needs: addon-validation
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: config_pilot/frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm install --package-lock-only
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+  terminal-pty-tests:
+    needs: backend-tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: config_pilot/backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm install --package-lock-only
+      - run: npm ci
+      - run: npm run test:pty
+  file-manager-tests:
+    needs: backend-tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: config_pilot/backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm install --package-lock-only
+      - run: npm ci
+      - run: npm run test:file-manager
+  browser-rendering:
+    needs: [backend-tests, frontend-tests]
+    uses: ./.github/workflows/browser-rendering.yml
+  docker-build-smoke:
+    needs: [backend-tests, frontend-tests]
+    uses: ./.github/workflows/docker-build.yml
+  security-scan:
+    needs: [addon-validation]
+    uses: ./.github/workflows/security.yml
+  devcontainer-smoke:
+    needs: [backend-tests, frontend-tests]
+    uses: ./.github/workflows/devcontainer-smoke.yml
+  ha-local-install-smoke:
+    needs: docker-build-smoke
+    uses: ./.github/workflows/ha-local-install-smoke.yml
+  final-summary:
+    needs:
+      - repository-validation
+      - remote-only
+      - name-collision
+      - addon-validation
+      - backend-tests
+      - frontend-tests
+      - terminal-pty-tests
+      - file-manager-tests
+      - browser-rendering
+      - docker-build-smoke
+      - security-scan
+      - devcontainer-smoke
+      - ha-local-install-smoke
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Write summary
+        run: |
+          echo "### Config Pilot CI summary" >> "$GITHUB_STEP_SUMMARY"
+          echo "Repository, add-on, backend, frontend, PTY, file manager, browser, Docker, security, devcontainer, and Home Assistant smoke workflows were scheduled." >> "$GITHUB_STEP_SUMMARY"

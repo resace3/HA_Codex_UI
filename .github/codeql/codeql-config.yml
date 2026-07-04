@@ -1,0 +1,8 @@
+name: Config Pilot CodeQL
+paths:
+  - config_pilot/backend/src
+  - config_pilot/frontend/src
+paths-ignore:
+  - "**/node_modules/**"
+  - "**/dist/**"
+  - "**/coverage/**"

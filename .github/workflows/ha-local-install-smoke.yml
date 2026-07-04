@@ -1,0 +1,31 @@
+name: Home Assistant Local Install Smoke
+
+on:
+  workflow_call:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ha-local-install-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ha-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate local add-on structure
+        run: python3 scripts/validate-addon-metadata.py
+      - name: Build and run HA-like image smoke
+        run: bash scripts/smoke-ha-local-install.sh
+      - name: Run container health smoke
+        run: bash scripts/smoke-docker-image.sh
+      - name: Summary
+        if: always()
+        run: |
+          echo "### Home Assistant local install smoke" >> "$GITHUB_STEP_SUMMARY"
+          echo "Required structure and container health checks ran. Full Supervisor install is reported only when the runner supports it." >> "$GITHUB_STEP_SUMMARY"

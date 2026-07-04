@@ -1,0 +1,48 @@
+name: Backend Tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: backend-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: config_pilot/backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: config_pilot/backend/package-lock.json
+      - name: Bootstrap lockfile remotely
+        run: npm install --package-lock-only
+      - name: Install backend dependencies
+        run: npm ci
+      - name: Lint
+        run: npm run lint
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Unit tests and coverage
+        run: npm test
+      - name: Build backend
+        run: npm run build
+      - name: API and WebSocket smoke
+        working-directory: .
+        run: bash scripts/smoke-backend.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-coverage
+          path: config_pilot/backend/coverage
+          if-no-files-found: ignore

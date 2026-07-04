@@ -1,0 +1,50 @@
+name: Actions Remote Only
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: actions-remote-only-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  remote-only:
+    name: Validate Remote-Only Guardrails
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check shell script guards
+        run: |
+          set -euo pipefail
+          required='if [ "${GITHUB_ACTIONS:-}" != "true" ]; then'
+          while IFS= read -r script; do
+            if ! grep -Fq "${required}" "${script}"; then
+              echo "Missing GitHub Actions guard: ${script}"
+              exit 1
+            fi
+          done < <(find scripts .devcontainer -name '*.sh' -type f | sort)
+      - name: Check documentation remote execution policy
+        run: |
+          set -euo pipefail
+          grep -F "execution is intentionally delegated to GitHub Actions" README.md
+          grep -F "Do not run tests, builds, Docker, devcontainers, package installers, or generated scripts locally" AGENTS.md
+          if grep -R "act " .github README.md AGENTS.md SECURITY.md config_pilot/DOCS.md config_pilot/README.md; then
+            echo "Found unsupported local Actions runner reference."
+            exit 1
+          fi
+      - name: Check docs do not instruct local heavy execution
+        run: |
+          set -euo pipefail
+          if grep -RInE '(^|[[:space:]])(npm install|npm ci|npm test|npm run build|docker build|docker run|docker compose|devcontainer up|pytest|vitest|playwright test)([[:space:]]|$)' README.md AGENTS.md SECURITY.md config_pilot/README.md config_pilot/DOCS.md .devcontainer/README.md; then
+            echo "Documentation must not instruct local heavy execution."
+            exit 1
+          fi
+      - name: Summary
+        run: |
+          echo "### Remote-only guardrails" >> "$GITHUB_STEP_SUMMARY"
+          echo "All generated heavy scripts are guarded for GitHub Actions." >> "$GITHUB_STEP_SUMMARY"

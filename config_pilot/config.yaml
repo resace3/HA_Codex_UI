@@ -1,0 +1,73 @@
+name: Config Pilot
+slug: config_pilot
+description: Run Codex CLI, manage files, and inspect changes from Home Assistant.
+version: 0.1.0
+arch:
+  - amd64
+  - aarch64
+startup: services
+boot: manual
+ingress: true
+ingress_port: 8107
+panel_icon: mdi:robot
+panel_title: Config Pilot
+init: false
+map:
+  - type: config
+    read_only: true
+  - type: share
+    read_only: false
+  - type: addons
+    read_only: true
+  - type: backup
+    read_only: true
+options:
+  default_workspace: /share/config_pilot_workspace
+  upload_workspace: /share/config_pilot_uploads
+  allowed_workspaces:
+    - /share/config_pilot_workspace
+    - /share/config_pilot_uploads
+    - /config
+  allow_config_write: false
+  allow_addons_write: false
+  allow_backup_write: false
+  allow_shell: true
+  allow_codex: true
+  allow_file_upload: true
+  allow_file_download: true
+  allow_terminal_persistence: true
+  max_upload_mb: 50
+  max_terminal_sessions: 8
+  terminal_idle_timeout_minutes: 120
+  redacted_log_output: true
+  codex_install_mode: bundled
+  codex_home: /data/config_pilot/.codex
+  app_data_dir: /data/config_pilot
+  require_confirm_for_writes: true
+  require_confirm_for_config_changes: true
+  create_snapshot_before_write: true
+  log_level: info
+schema:
+  default_workspace: str
+  upload_workspace: str
+  allowed_workspaces:
+    - str
+  allow_config_write: bool
+  allow_addons_write: bool
+  allow_backup_write: bool
+  allow_shell: bool
+  allow_codex: bool
+  allow_file_upload: bool
+  allow_file_download: bool
+  allow_terminal_persistence: bool
+  max_upload_mb: int(1,1024)
+  max_terminal_sessions: int(1,32)
+  terminal_idle_timeout_minutes: int(5,1440)
+  redacted_log_output: bool
+  codex_install_mode: list(bundled|external|disabled)
+  codex_home: str
+  app_data_dir: str
+  require_confirm_for_writes: bool
+  require_confirm_for_config_changes: bool
+  create_snapshot_before_write: bool
+  log_level: list(trace|debug|info|warn|error)

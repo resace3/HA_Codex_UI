@@ -1,0 +1,31 @@
+name: File Manager Tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: file-manager-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  file-manager:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: config_pilot/backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm install --package-lock-only
+      - run: npm ci
+      - name: Run file manager and path policy tests
+        run: npm run test:file-manager
+      - name: Run diff and snapshot tests
+        run: npx vitest run tests/diffService.test.ts

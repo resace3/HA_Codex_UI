@@ -1,0 +1,33 @@
+name: Terminal PTY Tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: terminal-pty-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pty:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: config_pilot/backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: sudo apt-get update && sudo apt-get install -y build-essential python3
+      - run: npm install --package-lock-only
+      - run: npm ci
+      - name: Run real PTY tests
+        run: npm run test:pty
+      - name: Verify WebSocket bridge coverage
+        working-directory: .
+        run: bash scripts/check-websocket-proxy.sh

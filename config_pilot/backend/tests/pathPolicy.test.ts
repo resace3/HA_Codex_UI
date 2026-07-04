@@ -1,0 +1,74 @@
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import {
+  assertInsideWorkspace,
+  isDownloadAllowed,
+  isReadAllowed,
+  isSensitivePath,
+  isWriteAllowed,
+  resolveWorkspacePath,
+  sanitizeArchivePath,
+} from "../src/security/pathPolicy.js";
+
+describe("pathPolicy", () => {
+  let root: string;
+
+  beforeEach(async () => {
+    root = await fs.promises.mkdtemp(path.join(os.tmpdir(), "config-pilot-path-"));
+    await fs.promises.mkdir(path.join(root, "sub"), { recursive: true });
+    await fs.promises.writeFile(path.join(root, "sub", "normal.yaml"), "name: ok\n", "utf8");
+  });
+
+  it("blocks traversal outside the workspace", () => {
+    expect(() => resolveWorkspacePath(root, "../outside.txt")).toThrow(/outside/);
+  });
+
+  it("blocks absolute path escape", () => {
+    expect(() => resolveWorkspacePath(root, "/etc/passwd")).toThrow(/outside/);
+  });
+
+  it("blocks symlink escape", async () => {
+    const outside = await fs.promises.mkdtemp(path.join(os.tmpdir(), "config-pilot-outside-"));
+    await fs.promises.writeFile(path.join(outside, "secret.txt"), "hidden", "utf8");
+    await fs.promises.symlink(outside, path.join(root, "escape"));
+    const resolved = path.join(root, "escape", "secret.txt");
+    expect(() => assertInsideWorkspace(root, resolved)).toThrow(/outside/);
+  });
+
+  it("blocks Codex auth storage", () => {
+    expect(isSensitivePath("/data/config_pilot/.codex/auth.json")).toBe(true);
+    expect(isReadAllowed({ workspaceRoot: "/data/config_pilot", resolvedPath: "/data/config_pilot/.codex/auth.json" })).toBe(false);
+  });
+
+  it("blocks SSH and GnuPG paths", () => {
+    expect(isSensitivePath(path.join(root, ".ssh", "id_ed25519"))).toBe(true);
+    expect(isSensitivePath(path.join(root, ".gnupg", "private-keys-v1.d", "key"))).toBe(true);
+  });
+
+  it("blocks secrets.yaml by default", () => {
+    expect(isSensitivePath(path.join(root, "secrets.yaml"))).toBe(true);
+  });
+
+  it("allows secrets.yaml.example", () => {
+    expect(isSensitivePath(path.join(root, "secrets.yaml.example"))).toBe(false);
+  });
+
+  it("allows normal files in a workspace", () => {
+    const resolved = resolveWorkspacePath(root, "sub/normal.yaml");
+    expect(isReadAllowed({ workspaceRoot: root, resolvedPath: resolved })).toBe(true);
+    expect(isDownloadAllowed({ workspaceRoot: root, resolvedPath: resolved })).toBe(true);
+    expect(isWriteAllowed({ workspaceRoot: root, resolvedPath: resolved, workspaceWritable: true })).toBe(true);
+  });
+
+  it("blocks case-insensitive sensitive variants", () => {
+    expect(isSensitivePath(path.join(root, "SeCrEtS.YaMl"))).toBe(true);
+    expect(isSensitivePath(path.join(root, ".SSH", "config"))).toBe(true);
+  });
+
+  it("prevents zip-slip archive paths", () => {
+    expect(() => sanitizeArchivePath("../escape.txt")).toThrow(/Archive path/);
+    expect(() => sanitizeArchivePath("safe/../../escape.txt")).toThrow(/Archive path/);
+    expect(sanitizeArchivePath("safe/file.txt")).toBe("safe/file.txt");
+  });
+});

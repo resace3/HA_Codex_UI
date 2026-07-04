@@ -1,0 +1,7 @@
+config_pilot_fixture:
+  alias: Config Pilot fixture script
+  sequence:
+    - service: logbook.log
+      data:
+        name: Config Pilot
+        message: Fixture script executed.

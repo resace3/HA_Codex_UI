@@ -1,0 +1,52 @@
+name: Frontend Tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: frontend-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: config_pilot/frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: config_pilot/frontend/package-lock.json
+      - name: Bootstrap lockfile remotely
+        run: npm install --package-lock-only
+      - name: Install frontend dependencies
+        run: npm ci
+      - name: Lint
+        run: npm run lint
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Unit tests and coverage
+        run: npm test
+      - name: Build
+        run: npm run build
+      - name: Check built assets and URL policy
+        run: |
+          test -f dist/index.html
+          if grep -R "http://localhost" src dist; then
+            echo "Hardcoded localhost URL found."
+            exit 1
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: frontend-coverage
+          path: config_pilot/frontend/coverage
+          if-no-files-found: ignore

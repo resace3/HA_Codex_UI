@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 180" role="img" aria-label="Config Pilot logo">
+  <rect width="640" height="180" rx="28" fill="#0b151d"/>
+  <g transform="translate(34 30)">
+    <rect width="120" height="120" rx="22" fill="#101a22" stroke="#27414f" stroke-width="4"/>
+    <path d="M30 70c0-24 13-42 30-42s30 18 30 42v20H30V70Z" fill="#153044" stroke="#5eead4" stroke-width="6"/>
+    <path d="M42 56h36v24H42z" fill="#081016" stroke="#7dd3fc" stroke-width="5"/>
+    <circle cx="53" cy="68" r="4" fill="#86efac"/>
+    <circle cx="67" cy="68" r="4" fill="#facc15"/>
+  </g>
+  <text x="182" y="86" fill="#d8e4ec" font-family="Inter, Arial, sans-serif" font-size="42" font-weight="700">Config Pilot</text>
+  <text x="184" y="122" fill="#91a8b6" font-family="Inter, Arial, sans-serif" font-size="19">Home Assistant file, terminal, and Codex workspace</text>
+</svg>

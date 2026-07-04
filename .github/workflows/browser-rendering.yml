@@ -1,0 +1,77 @@
+name: Browser Rendering
+
+on:
+  workflow_call:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: browser-rendering-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    env:
+      CODEX_STUB: "1"
+      CONFIG_PILOT_DIRECT_ACCESS: "1"
+      CONFIG_PILOT_FRONTEND_DIR: "/tmp/config-pilot-e2e/frontend"
+      PORT: "8107"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install backend
+        working-directory: config_pilot/backend
+        run: |
+          npm install --package-lock-only
+          npm ci
+          npm run build
+      - name: Install frontend and browsers
+        working-directory: config_pilot/frontend
+        run: |
+          npm install --package-lock-only
+          npm ci
+          npm run build
+          npx playwright install --with-deps chromium
+      - name: Prepare runtime fixtures
+        run: |
+          mkdir -p /tmp/config-pilot-e2e/data /tmp/config-pilot-e2e/share/config_pilot_workspace /tmp/config-pilot-e2e/share/config_pilot_uploads
+          cp -R config_pilot/frontend/dist /tmp/config-pilot-e2e/frontend
+          cat > /tmp/config-pilot-e2e/options.json <<JSON
+          {
+            "default_workspace": "/tmp/config-pilot-e2e/share/config_pilot_workspace",
+            "upload_workspace": "/tmp/config-pilot-e2e/share/config_pilot_uploads",
+            "allowed_workspaces": ["/tmp/config-pilot-e2e/share/config_pilot_workspace", "/tmp/config-pilot-e2e/share/config_pilot_uploads"],
+            "app_data_dir": "/tmp/config-pilot-e2e/data/config_pilot",
+            "codex_home": "/tmp/config-pilot-e2e/data/config_pilot/.codex"
+          }
+          JSON
+      - name: Start backend
+        working-directory: config_pilot/backend
+        run: |
+          CONFIG_PILOT_OPTIONS=/tmp/config-pilot-e2e/options.json node dist/index.js > /tmp/config-pilot-e2e/backend.log 2>&1 &
+          echo $! > /tmp/config-pilot-e2e/backend.pid
+          for i in $(seq 1 60); do
+            curl -fsS http://127.0.0.1:8107/api/health && exit 0
+            sleep 1
+          done
+          cat /tmp/config-pilot-e2e/backend.log
+          exit 1
+      - name: Run Playwright
+        working-directory: config_pilot/frontend
+        run: npm run e2e
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: browser-rendering-artifacts
+          path: |
+            config_pilot/frontend/playwright-report
+            config_pilot/frontend/test-results
+            /tmp/config-pilot-e2e/backend.log
+          if-no-files-found: ignore
