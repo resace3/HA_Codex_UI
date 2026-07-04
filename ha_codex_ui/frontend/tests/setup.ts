@@ -25,3 +25,14 @@ Object.defineProperty(window, "ResizeObserver", {
   writable: true,
   value: ResizeObserverMock,
 });
+
+Object.defineProperty(HTMLCanvasElement.prototype, "getContext", {
+  writable: true,
+  value: vi.fn(() => ({
+    clearRect: vi.fn(),
+    fillRect: vi.fn(),
+    getImageData: vi.fn(() => ({ data: new Uint8ClampedArray([0, 0, 0, 255]) })),
+    measureText: vi.fn(() => ({ width: 0 })),
+    createLinearGradient: vi.fn(() => ({ addColorStop: vi.fn() })),
+  })),
+});

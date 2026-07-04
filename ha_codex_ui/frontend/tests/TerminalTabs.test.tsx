@@ -16,7 +16,7 @@ it("renders and closes terminal tabs", async () => {
       onCloseTerminal={close}
     />,
   );
-  expect(screen.getByText("Shell")).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: /Shell running/ })).toBeInTheDocument();
   await user.click(screen.getByTitle("Close terminal"));
   expect(close).toHaveBeenCalledWith("1");
 });
