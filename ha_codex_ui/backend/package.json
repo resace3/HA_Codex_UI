@@ -27,7 +27,7 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
-    "@eslint/js": "^9.17.0",
+    "@eslint/js": "^10.0.1",
     "@types/archiver": "^6.0.3",
     "@types/mime-types": "^2.1.4",
     "@types/node": "^22.10.2",
