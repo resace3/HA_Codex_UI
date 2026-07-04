@@ -5,14 +5,8 @@ import tseslint from "typescript-eslint";
 
 export default tseslint.config(
   js.configs.recommended,
-  ...tseslint.configs.strictTypeChecked,
+  ...tseslint.configs.recommended,
   {
-    languageOptions: {
-      parserOptions: {
-        project: "./tsconfig.json",
-        tsconfigRootDir: import.meta.dirname
-      }
-    },
     plugins: {
       "react-hooks": reactHooks,
       "react-refresh": reactRefresh

@@ -1,4 +1,3 @@
-import fs from "node:fs";
 import path from "node:path";
 import type { AddonOptions } from "../config/addonOptions.js";
 import { ADDON_VERSION, SERVICE_NAME } from "../config/paths.js";

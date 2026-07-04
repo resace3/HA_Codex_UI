@@ -9,6 +9,9 @@
     "CONFIG_PILOT_DIRECT_ACCESS": "1",
     "PORT": "8107"
   },
+  "remoteEnv": {
+    "GITHUB_ACTIONS": "${localEnv:GITHUB_ACTIONS}"
+  },
   "postCreateCommand": "bash .devcontainer/postCreateCommand.sh",
   "customizations": {
     "vscode": {

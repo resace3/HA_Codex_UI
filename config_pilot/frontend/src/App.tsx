@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { api } from "./api/client";
-import type { CodexStatus, DiagnosticsReport, DiffStatus, FileReadResult, TerminalModel, Workspace } from "./api/types";
+import type { CodexStatus, DiagnosticsReport, DiffStatus, FileReadResult, Workspace } from "./api/types";
 import AppShell from "./components/AppShell";
 import { useFileTree } from "./hooks/useFileTree";
 import { useResponsiveLayout } from "./hooks/useResponsiveLayout";

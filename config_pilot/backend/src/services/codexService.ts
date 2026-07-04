@@ -1,5 +1,4 @@
 import fs from "node:fs";
-import path from "node:path";
 import type { AddonOptions } from "../config/addonOptions.js";
 import { DEFAULT_CODEX_HOME } from "../config/paths.js";
 import { ensureDir } from "../utils/fs.js";
