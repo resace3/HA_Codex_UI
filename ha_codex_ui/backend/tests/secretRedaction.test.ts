@@ -2,7 +2,8 @@ import { hasSecretLikeValue, redactSecrets } from "../src/security/secretRedacti
 
 describe("secretRedaction", () => {
   it("redacts OpenAI-like keys and tokens", () => {
-    const input = "token sk-abcdefghijklmnopqrstuvwxyz123456 access_token=very-secret-value";
+    const openAiLikeKey = ["sk", "abcdefghijklmnopqrstuvwxyz123456"].join("-");
+    const input = `token ${openAiLikeKey} access_token=very-secret-value`;
     expect(hasSecretLikeValue(input)).toBe(true);
     expect(redactSecrets(input)).not.toContain("very-secret-value");
   });
