@@ -1,12 +1,16 @@
 # HA_Codex_UI
 
-HA_Codex_UI is a private Home Assistant add-on repository for a secure Ingress web app that provides a browser-based file manager, editor, multi-terminal workspace, Codex CLI launcher, changed-file inspector, diffs, snapshots, diagnostics, and Home Assistant-focused guardrails.
+HA_Codex_UI is a Home Assistant add-on repository for a secure Ingress web app that provides a browser-based file manager, editor, multi-terminal workspace, Codex CLI launcher, changed-file inspector, diffs, snapshots, diagnostics, and Home Assistant-focused guardrails.
 
 Terminals and Codex sessions are powerful. They can run commands and modify any workspace that is mounted read-write. The default add-on configuration keeps `/config`, `/addons`, and `/backup` read-only, and uses `/share/ha_codex_ui_workspace` plus `/share/ha_codex_ui_uploads` for write workflows.
 
 [![Open your Home Assistant instance and add this add-on repository](https://my.home-assistant.io/badges/supervisor_add_addon_repository.svg)](https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A%2F%2Fgithub.com%2Fresace3%2FHA_Codex_UI)
 
-The button opens your Home Assistant instance and pre-fills this repository URL. For a private repository, make sure your Home Assistant device can access `https://github.com/resace3/HA_Codex_UI`.
+<a href="https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A%2F%2Fgithub.com%2Fresace3%2FHA_Codex_UI">
+  <img alt="Install HA_Codex_UI in Home Assistant" src="https://img.shields.io/badge/Install%20in%20Home%20Assistant-43A047?style=for-the-badge&logo=homeassistant&logoColor=white"/>
+</a>
+
+The button opens your Home Assistant instance and pre-fills this repository URL.
 
 ## Local Execution Policy
 
@@ -36,15 +40,14 @@ Generated scripts in `scripts/` and `.devcontainer/` refuse to run unless `GITHU
 
 ## Screenshots
 
-![HA_Codex_UI browser workspace](docs/images/ha-codex-ui-screenshot.svg)
+[![HA_Codex_UI browser workspace](docs/images/ha-codex-ui-screenshot.svg)](https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A%2F%2Fgithub.com%2Fresace3%2FHA_Codex_UI)
 
 Browser rendering workflows also upload screenshots and traces as GitHub Actions artifacts when failures occur.
 
-## Install Option 1: Private GitHub Add-on Repository
+## Install Option 1: GitHub Add-on Repository
 
-1. Push this repository to the private GitHub repository `resace3/HA_Codex_UI`.
-2. Make sure the Home Assistant installation can access the private repository.
-3. Click the button above, or add the repository URL in the Home Assistant add-on store.
+1. Push this repository to the public GitHub repository `resace3/HA_Codex_UI`.
+2. Click the install button above, or add the repository URL in the Home Assistant add-on store.
 4. Install **HA_Codex_UI**.
 5. Review add-on options.
 6. Start the add-on.
