@@ -77,6 +77,9 @@ export class WorkspaceService {
 
   private isRootWritableByPolicy(root: string): boolean {
     const normalized = path.resolve(root);
+    if (normalized === path.resolve(this.options.default_workspace) || normalized === path.resolve(this.options.upload_workspace)) {
+      return true;
+    }
     if (normalized === path.resolve(DEFAULT_WORKSPACE) || normalized === path.resolve(DEFAULT_UPLOAD_WORKSPACE)) {
       return true;
     }

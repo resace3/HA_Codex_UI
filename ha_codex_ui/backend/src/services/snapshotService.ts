@@ -20,7 +20,7 @@ export class SnapshotService {
     const id = `${Date.now()}-${reason.replace(/[^a-z0-9-]/gi, "-").toLowerCase()}`;
     const snapshotRoot = path.join(this.options.app_data_dir, "snapshots", id);
     await ensureDir(snapshotRoot);
-    await copyWorkspace(workspaceRoot, snapshotRoot, workspaceRoot);
+    await copyWorkspace(workspaceRoot, snapshotRoot, workspaceRoot, [this.options.app_data_dir, this.options.codex_home]);
     await fs.promises.writeFile(
       path.join(snapshotRoot, ".ha-codex-ui-snapshot.json"),
       JSON.stringify({ id, workspaceRoot, createdAt: new Date().toISOString(), reason }, null, 2),
@@ -42,18 +42,23 @@ export class SnapshotService {
   }
 }
 
-async function copyWorkspace(sourceRoot: string, targetRoot: string, baseRoot: string): Promise<void> {
+async function copyWorkspace(sourceRoot: string, targetRoot: string, baseRoot: string, skipRoots: string[]): Promise<void> {
   const entries = await fs.promises.readdir(sourceRoot, { withFileTypes: true });
   for (const entry of entries) {
     const source = path.join(sourceRoot, entry.name);
     const relative = path.relative(baseRoot, source);
-    if (entry.name === ".git" || entry.name === "node_modules" || isSensitivePath(source)) {
+    const resolvedSource = path.resolve(source);
+    const shouldSkipRoot = skipRoots.some((root) => {
+      const resolvedRoot = path.resolve(root);
+      return resolvedSource === resolvedRoot || resolvedSource.startsWith(`${resolvedRoot}${path.sep}`);
+    });
+    if (entry.name === ".git" || entry.name === "node_modules" || shouldSkipRoot || isSensitivePath(source)) {
       continue;
     }
     const target = path.join(targetRoot, sanitizeArchivePath(relative));
     if (entry.isDirectory()) {
       await ensureDir(target);
-      await copyWorkspace(source, targetRoot, baseRoot);
+      await copyWorkspace(source, targetRoot, baseRoot, skipRoots);
       continue;
     }
     if (!entry.isFile()) {

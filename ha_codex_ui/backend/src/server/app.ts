@@ -1,5 +1,4 @@
 import fs from "node:fs";
-import path from "node:path";
 import Fastify, { type FastifyBaseLogger } from "fastify";
 import multipart from "@fastify/multipart";
 import staticPlugin from "@fastify/static";
@@ -85,6 +84,10 @@ export async function buildApp(options: AddonOptions, services = createServices(
       wildcard: false,
     });
     app.setNotFoundHandler(async (_request, reply) => reply.sendFile("index.html"));
+  } else {
+    app.get("/", async () => {
+      return { ok: true, data: { service: "ha-codex-ui", message: "Frontend assets are not built in this runtime." } };
+    });
   }
   const startedAt = Date.now();
   registerHealthRoutes(app, startedAt);
@@ -96,12 +99,5 @@ export async function buildApp(options: AddonOptions, services = createServices(
   registerDiffRoutes(app, services.workspaceService, services.diffService);
   registerSettingsRoutes(app, services.settingsService);
   registerHaRoutes(app, services.haService);
-  app.get("/", async (_request, reply) => {
-    const index = path.join(FRONTEND_DIST_DIR, "index.html");
-    if (fs.existsSync(index)) {
-      return reply.sendFile("index.html");
-    }
-    return { ok: true, data: { service: "ha-codex-ui", message: "Frontend assets are not built in this runtime." } };
-  });
   return { app, services };
 }
