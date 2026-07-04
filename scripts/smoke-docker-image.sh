@@ -41,10 +41,19 @@ for _ in $(seq 1 90); do
 done
 curl -fsS http://127.0.0.1:8107/api/health
 curl -fsS http://127.0.0.1:8107/api/diagnostics
+workspaces_json="$(curl -fsS http://127.0.0.1:8107/api/workspaces)"
+upload_workspace_id="$(printf '%s' "${workspaces_json}" | jq -r '.data[] | select(.root == "/share/ha_codex_ui_uploads") | .id')"
+default_workspace_id="$(printf '%s' "${workspaces_json}" | jq -r '.data[] | select(.root == "/share/ha_codex_ui_workspace") | .id')"
+if [ -z "${upload_workspace_id}" ] || [ "${upload_workspace_id}" = "null" ] || [ -z "${default_workspace_id}" ] || [ "${default_workspace_id}" = "null" ]; then
+  echo "Unable to resolve Docker smoke workspace ids from /api/workspaces."
+  printf '%s\n' "${workspaces_json}"
+  exit 1
+fi
 printf 'docker upload smoke\n' > "${tmp}/upload.txt"
-curl -fsS -F "file=@${tmp}/upload.txt" "http://127.0.0.1:8107/api/files/upload?workspaceId=uploads&path=.&overwrite=true&confirmed=true"
-curl -fsS "http://127.0.0.1:8107/api/files/download?workspaceId=uploads&path=upload.txt" | grep -F "docker upload smoke"
-terminal_id="$(curl -fsS -H 'Content-Type: application/json' -d '{"type":"shell","workspaceId":"share-workspace","name":"Docker Smoke","command":"sleep 5","confirmed":true}' http://127.0.0.1:8107/api/terminals | jq -r '.data.id')"
+curl -fsS -F "file=@${tmp}/upload.txt" "http://127.0.0.1:8107/api/files/upload?workspaceId=${upload_workspace_id}&path=.&overwrite=true&confirmed=true"
+curl -fsS "http://127.0.0.1:8107/api/files/download?workspaceId=${upload_workspace_id}&path=upload.txt" | grep -F "docker upload smoke"
+terminal_payload="$(jq -cn --arg workspaceId "${default_workspace_id}" '{type:"shell",workspaceId:$workspaceId,name:"Docker Smoke",command:"sleep 5",confirmed:true}')"
+terminal_id="$(curl -fsS -H 'Content-Type: application/json' -d "${terminal_payload}" http://127.0.0.1:8107/api/terminals | jq -r '.data.id')"
 TERMINAL_ID="${terminal_id}" node - <<'NODE'
 const id = process.env.TERMINAL_ID;
 const socket = new WebSocket(`ws://127.0.0.1:8107/api/terminals/${id}/ws`);

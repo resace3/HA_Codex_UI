@@ -15,11 +15,13 @@ npm run build
 tmp="$(mktemp -d)"
 trap 'kill "${server_pid:-0}" 2>/dev/null || true; rm -rf "${tmp}"' EXIT
 mkdir -p "${tmp}/data" "${tmp}/share/ha_codex_ui_workspace" "${tmp}/share/ha_codex_ui_uploads"
+default_workspace="${tmp}/share/ha_codex_ui_workspace"
+upload_workspace="${tmp}/share/ha_codex_ui_uploads"
 cat > "${tmp}/options.json" <<JSON
 {
-  "default_workspace": "${tmp}/share/ha_codex_ui_workspace",
-  "upload_workspace": "${tmp}/share/ha_codex_ui_uploads",
-  "allowed_workspaces": ["${tmp}/share/ha_codex_ui_workspace", "${tmp}/share/ha_codex_ui_uploads"],
+  "default_workspace": "${default_workspace}",
+  "upload_workspace": "${upload_workspace}",
+  "allowed_workspaces": ["${default_workspace}", "${upload_workspace}"],
   "app_data_dir": "${tmp}/data/ha_codex_ui",
   "codex_home": "${tmp}/data/ha_codex_ui/.codex"
 }
@@ -34,10 +36,19 @@ for _ in $(seq 1 60); do
 done
 curl -fsS http://127.0.0.1:8107/api/health
 curl -fsS http://127.0.0.1:8107/api/diagnostics
+workspaces_json="$(curl -fsS http://127.0.0.1:8107/api/workspaces)"
+upload_workspace_id="$(printf '%s' "${workspaces_json}" | jq -r --arg root "${upload_workspace}" '.data[] | select(.root == $root) | .id')"
+default_workspace_id="$(printf '%s' "${workspaces_json}" | jq -r --arg root "${default_workspace}" '.data[] | select(.root == $root) | .id')"
+if [ -z "${upload_workspace_id}" ] || [ "${upload_workspace_id}" = "null" ] || [ -z "${default_workspace_id}" ] || [ "${default_workspace_id}" = "null" ]; then
+  echo "Unable to resolve smoke workspace ids from /api/workspaces."
+  printf '%s\n' "${workspaces_json}"
+  exit 1
+fi
 printf 'upload smoke\n' > "${tmp}/upload.txt"
-curl -fsS -F "file=@${tmp}/upload.txt" "http://127.0.0.1:8107/api/files/upload?workspaceId=uploads&path=.&overwrite=true&confirmed=true"
-curl -fsS "http://127.0.0.1:8107/api/files/download?workspaceId=uploads&path=upload.txt" | grep -F "upload smoke"
-terminal_id="$(curl -fsS -H 'Content-Type: application/json' -d '{"type":"shell","workspaceId":"share-workspace","name":"Smoke","command":"sleep 5","confirmed":true}' http://127.0.0.1:8107/api/terminals | jq -r '.data.id')"
+curl -fsS -F "file=@${tmp}/upload.txt" "http://127.0.0.1:8107/api/files/upload?workspaceId=${upload_workspace_id}&path=.&overwrite=true&confirmed=true"
+curl -fsS "http://127.0.0.1:8107/api/files/download?workspaceId=${upload_workspace_id}&path=upload.txt" | grep -F "upload smoke"
+terminal_payload="$(jq -cn --arg workspaceId "${default_workspace_id}" '{type:"shell",workspaceId:$workspaceId,name:"Smoke",command:"sleep 5",confirmed:true}')"
+terminal_id="$(curl -fsS -H 'Content-Type: application/json' -d "${terminal_payload}" http://127.0.0.1:8107/api/terminals | jq -r '.data.id')"
 TERMINAL_ID="${terminal_id}" node - <<'NODE'
 const id = process.env.TERMINAL_ID;
 const socket = new WebSocket(`ws://127.0.0.1:8107/api/terminals/${id}/ws`);
