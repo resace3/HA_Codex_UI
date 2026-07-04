@@ -4,7 +4,7 @@
     "dockerfile": "Dockerfile",
     "context": ".."
   },
-  "workspaceFolder": "/workspaces/ha-codex-ui",
+  "workspaceFolder": "/workspaces/HA_Codex_UI",
   "containerEnv": {
     "HA_CODEX_UI_DIRECT_ACCESS": "1",
     "PORT": "8107"

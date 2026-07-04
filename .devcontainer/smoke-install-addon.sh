@@ -5,7 +5,7 @@ if [ "${GITHUB_ACTIONS:-}" != "true" ]; then
 fi
 
 set -euo pipefail
-cd /workspaces/ha-codex-ui
+cd /workspaces/HA_Codex_UI
 python3 scripts/validate-addon-metadata.py
 test -f repository.yaml
 test -f ha_codex_ui/config.yaml

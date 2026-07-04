@@ -16,4 +16,4 @@ RUN apt-get update \
 
 RUN npm install -g @devcontainers/cli
 
-WORKDIR /workspaces/ha-codex-ui
+WORKDIR /workspaces/HA_Codex_UI
