@@ -11,11 +11,29 @@ cd "${ROOT}"
 image="ghcr.io/resace3/ha-codex-ui:ci-smoke"
 tmp="$(mktemp -d)"
 container="ha-codex-ui-smoke-${GITHUB_RUN_ID:-manual}"
-trap 'docker logs "${container}" > "${tmp}/container.log" 2>&1 || true; docker rm -f "${container}" >/dev/null 2>&1 || true; rm -rf "${tmp}"' EXIT
+cleanup() {
+  status=$?
+  if [ "${status}" -ne 0 ]; then
+    echo "Container logs from failed smoke run:"
+    docker logs "${container}" 2>&1 || true
+  fi
+  docker rm -f "${container}" >/dev/null 2>&1 || true
+  if command -v sudo >/dev/null 2>&1; then
+    sudo rm -rf "${tmp}" || true
+  else
+    rm -rf "${tmp}" || true
+  fi
+  exit "${status}"
+}
+trap cleanup EXIT
 mkdir -p "${tmp}/data" "${tmp}/share" "${tmp}/config"
 docker build --build-arg CODEX_STUB=1 -t "${image}" -f ha_codex_ui/Dockerfile ha_codex_ui
 docker run -d --name "${container}" -p 8107:8107 -v "${tmp}/data:/data" -v "${tmp}/share:/share" -v "${tmp}/config:/config:ro" "${image}"
 for _ in $(seq 1 90); do
+  if ! docker ps --format '{{.Names}}' | grep -Fx "${container}" >/dev/null; then
+    echo "Container exited before health check passed."
+    exit 1
+  fi
   if curl -fsS http://127.0.0.1:8107/api/health >/dev/null; then
     break
   fi

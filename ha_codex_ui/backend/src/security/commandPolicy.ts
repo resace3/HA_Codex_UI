@@ -1,4 +1,4 @@
-import { AddonOptions } from "../config/addonOptions.js";
+import type { AddonOptions } from "../config/addonOptions.js";
 import { SafeError } from "../types/api.js";
 import type { TerminalKind } from "../types/terminal.js";
 import type { Workspace } from "../types/workspace.js";
