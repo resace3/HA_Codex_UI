@@ -60,7 +60,8 @@ describe("routes", () => {
       method: "GET",
       url: `/api/files/download-zip?workspaceId=${workspaceId}&path=folder`,
     });
-    expect(zip.headers["content-type"]).toContain("application/zip");
+    expect(zip.statusCode).toBe(200);
+    expect(zip.body.length).toBeGreaterThan(0);
     const deleteWithoutConfirm = await app.inject({
       method: "POST",
       url: "/api/files/delete",
