@@ -38,7 +38,7 @@ jobs:
           npm install --package-lock-only
           npm ci
           npm run build
-          npx playwright install --with-deps chromium
+          npx playwright install --with-deps chromium webkit
       - name: Prepare runtime fixtures
         run: |
           mkdir -p /tmp/ha-codex-ui-e2e/data /tmp/ha-codex-ui-e2e/share/ha_codex_ui_workspace /tmp/ha-codex-ui-e2e/share/ha_codex_ui_uploads
