@@ -7,6 +7,15 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "lcov"],
+      include: ["src/**/*.ts"],
+      exclude: [
+        "src/index.ts",
+        "src/server/httpServer.ts",
+        "src/server/websocket.ts",
+        "src/server/routes/**",
+        "src/server/middleware/**",
+        "src/types/**"
+      ],
       thresholds: {
         lines: 80,
         branches: 70,

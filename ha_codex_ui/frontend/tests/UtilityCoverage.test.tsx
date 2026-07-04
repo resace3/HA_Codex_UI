@@ -1,7 +1,11 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import CodexLauncher from "../src/components/CodexLauncher";
 import ConfirmDangerDialog from "../src/components/ConfirmDangerDialog";
+import FileTree from "../src/components/FileTree";
 import Toasts from "../src/components/Toasts";
+import WorkspacePicker from "../src/components/WorkspacePicker";
+import type { FileTreeEntry, Workspace } from "../src/api/types";
 import { formatBytes, shortDate } from "../src/utils/format";
 import { apiPath, detectIngressBase, joinPath, websocketPath } from "../src/utils/paths";
 import { requiresDangerConfirmation, validateUploadSize } from "../src/utils/validation";
@@ -58,5 +62,92 @@ describe("utility and small component coverage", () => {
     render(<Toasts toasts={[{ id: 1, kind: "success", message: "Saved" }]} onDismiss={dismiss} />);
     await user.click(screen.getByText("Saved"));
     expect(dismiss).toHaveBeenCalledWith(1);
+  });
+
+  it("renders picker and tree variants", async () => {
+    const user = userEvent.setup();
+    const workspaceChange = vi.fn();
+    const openFile = vi.fn();
+    const openFolder = vi.fn();
+    const workspaces: Workspace[] = [
+      {
+        id: "share",
+        name: "Workspace",
+        root: "/share/ha_codex_ui_workspace",
+        readable: true,
+        writable: true,
+        sensitive: false,
+        reason: "Default writable workspace",
+      },
+      {
+        id: "config",
+        name: "Config",
+        root: "/config",
+        readable: true,
+        writable: false,
+        sensitive: true,
+      },
+    ];
+    const entries: FileTreeEntry[] = [
+      {
+        name: "folder",
+        path: "folder",
+        type: "directory",
+        size: 0,
+        modifiedAt: "2026-01-01T00:00:00.000Z",
+        writable: true,
+        sensitive: false,
+      },
+      {
+        name: "config.yaml",
+        path: "config.yaml",
+        type: "file",
+        size: 12,
+        modifiedAt: "2026-01-01T00:00:00.000Z",
+        writable: true,
+        sensitive: false,
+      },
+      {
+        name: "secrets.yaml",
+        path: "secrets.yaml",
+        type: "file",
+        size: 64,
+        modifiedAt: "2026-01-01T00:00:00.000Z",
+        writable: false,
+        sensitive: true,
+      },
+    ];
+    const { rerender } = render(
+      <>
+        <WorkspacePicker
+          workspaces={workspaces}
+          selectedWorkspace={workspaces[0]}
+          onWorkspaceChange={workspaceChange}
+        />
+        <FileTree entries={entries} onOpenFile={openFile} onOpenFolder={openFolder} />
+      </>,
+    );
+    await user.selectOptions(screen.getByLabelText(/Workspace/), "config");
+    await user.click(screen.getByText("folder"));
+    await user.click(screen.getByText("config.yaml"));
+    expect(workspaceChange).toHaveBeenCalledWith("config");
+    expect(openFolder).toHaveBeenCalledWith("folder");
+    expect(openFile).toHaveBeenCalledWith("config.yaml");
+    expect(screen.getByText("secrets.yaml").closest("button")).toBeDisabled();
+
+    rerender(<FileTree entries={[]} onOpenFile={openFile} onOpenFolder={openFolder} />);
+    expect(screen.getByText("No files.")).toBeInTheDocument();
+  });
+
+  it("requires confirmation before starting Codex", async () => {
+    const user = userEvent.setup();
+    const start = vi.fn();
+    render(<CodexLauncher onStart={start} />);
+    const button = screen.getByRole("button", { name: /Codex/ });
+    expect(button).toBeDisabled();
+    await user.type(screen.getByPlaceholderText("Starting prompt"), "Review YAML");
+    await user.click(screen.getByLabelText(/Codex can edit/));
+    await user.click(button);
+    expect(start).toHaveBeenCalledWith("Review YAML");
   });
 });

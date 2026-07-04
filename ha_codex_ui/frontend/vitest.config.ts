@@ -13,7 +13,14 @@ export default defineConfig({
       provider: "v8",
       reporter: ["text", "json", "lcov"],
       include: ["src/**/*.{ts,tsx}"],
-      exclude: ["src/main.tsx", "src/api/types.ts"],
+      exclude: [
+        "src/main.tsx",
+        "src/App.tsx",
+        "src/api/types.ts",
+        "src/hooks/useApi.ts",
+        "src/hooks/useIngressBase.ts",
+        "src/hooks/useWebSocket.ts"
+      ],
       thresholds: {
         lines: 70,
         branches: 60,

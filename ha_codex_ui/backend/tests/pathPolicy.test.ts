@@ -84,7 +84,21 @@ describe("pathPolicy", () => {
     expect(isSensitivePath(path.join(root, "access_token.json"))).toBe(true);
     expect(isSensitivePath(path.join(root, "profile", "Cookies.sqlite"))).toBe(true);
     expect(isSensitivePath(path.join(root, ".config", "configstore", "auth.json"))).toBe(true);
+    expect(isSensitivePath(path.join(root, ".config", "configstore", "session.db"))).toBe(true);
     expect(isSensitivePath(path.join(root, "Library", "Application Support", "Chrome", "Login Data"))).toBe(true);
+    expect(isSensitivePath(path.join(root, "Library", "Application Support", "profile.dat"))).toBe(true);
+  });
+
+  it("denies reads and writes outside the workspace", () => {
+    const outside = path.join(os.tmpdir(), "ha-codex-ui-outside-policy.txt");
+    expect(isReadAllowed({ workspaceRoot: root, resolvedPath: outside })).toBe(false);
+    expect(isWriteAllowed({ workspaceRoot: root, resolvedPath: outside, workspaceWritable: true })).toBe(false);
+    expect(() => assertReadAllowed({ workspaceRoot: root, resolvedPath: outside })).toThrow(/Reading/);
+  });
+
+  it("denies writes to sensitive paths before writable policy checks", () => {
+    const sensitive = resolveWorkspacePath(root, "secrets.yaml");
+    expect(isWriteAllowed({ workspaceRoot: root, resolvedPath: sensitive, workspaceWritable: true })).toBe(false);
   });
 
   it("requires writable policy and sensitive confirmations", () => {
@@ -127,6 +141,7 @@ describe("pathPolicy", () => {
 
   it("redacts sensitive paths for logs", () => {
     expect(redactPathForLog("/data/ha_codex_ui/.codex/auth.json")).toBe("[sensitive-path]");
+    expect(redactPathForLog("/data/ha_codex_ui/workspace/file.txt")).toBe("/data/ha_codex_ui/workspace/file.txt");
     expect(redactPathForLog(path.join(root, "sub", "normal.yaml"))).toContain("normal.yaml");
   });
 
