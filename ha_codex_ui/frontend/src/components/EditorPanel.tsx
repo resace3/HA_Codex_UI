@@ -18,6 +18,9 @@ export default function EditorPanel({ file, value, dirty, onChange, onSave }: Pr
   const containerRef = useRef<HTMLDivElement | null>(null);
   const viewRef = useRef<EditorView | null>(null);
   const onChangeRef = useRef(onChange);
+  const initialValueRef = useRef(value);
+
+  initialValueRef.current = value;
 
   useEffect(() => {
     onChangeRef.current = onChange;
@@ -37,7 +40,7 @@ export default function EditorPanel({ file, value, dirty, onChange, onSave }: Pr
       file?.name.endsWith(".ts") || file?.name.endsWith(".js") ? javascript() : yaml(),
     ];
     const view = new EditorView({
-      state: EditorState.create({ doc: value, extensions }),
+      state: EditorState.create({ doc: initialValueRef.current, extensions }),
       parent: containerRef.current,
     });
     viewRef.current = view;
