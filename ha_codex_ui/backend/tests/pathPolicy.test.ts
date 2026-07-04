@@ -2,11 +2,16 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import {
+  assertDownloadAllowed,
   assertInsideWorkspace,
+  assertReadAllowed,
+  assertWriteAllowed,
   isDownloadAllowed,
   isReadAllowed,
   isSensitivePath,
+  isUploadAllowed,
   isWriteAllowed,
+  redactPathForLog,
   resolveWorkspacePath,
   sanitizeArchivePath,
 } from "../src/security/pathPolicy.js";
@@ -58,7 +63,15 @@ describe("pathPolicy", () => {
     const resolved = resolveWorkspacePath(root, "sub/normal.yaml");
     expect(isReadAllowed({ workspaceRoot: root, resolvedPath: resolved })).toBe(true);
     expect(isDownloadAllowed({ workspaceRoot: root, resolvedPath: resolved })).toBe(true);
+    expect(isUploadAllowed({ workspaceRoot: root, resolvedPath: resolved, workspaceWritable: true })).toBe(
+      true,
+    );
     expect(isWriteAllowed({ workspaceRoot: root, resolvedPath: resolved, workspaceWritable: true })).toBe(true);
+    expect(() => assertReadAllowed({ workspaceRoot: root, resolvedPath: resolved })).not.toThrow();
+    expect(() => assertDownloadAllowed({ workspaceRoot: root, resolvedPath: resolved })).not.toThrow();
+    expect(() =>
+      assertWriteAllowed({ workspaceRoot: root, resolvedPath: resolved, workspaceWritable: true }),
+    ).not.toThrow();
   });
 
   it("blocks case-insensitive sensitive variants", () => {
@@ -66,9 +79,62 @@ describe("pathPolicy", () => {
     expect(isSensitivePath(path.join(root, ".SSH", "config"))).toBe(true);
   });
 
+  it("blocks token and browser credential paths", () => {
+    expect(isSensitivePath(path.join(root, "refresh_token.txt"))).toBe(true);
+    expect(isSensitivePath(path.join(root, "access_token.json"))).toBe(true);
+    expect(isSensitivePath(path.join(root, "profile", "Cookies.sqlite"))).toBe(true);
+    expect(isSensitivePath(path.join(root, ".config", "configstore", "auth.json"))).toBe(true);
+    expect(isSensitivePath(path.join(root, "Library", "Application Support", "Chrome", "Login Data"))).toBe(true);
+  });
+
+  it("requires writable policy and sensitive confirmations", () => {
+    const resolved = resolveWorkspacePath(root, "sub/normal.yaml");
+    expect(isWriteAllowed({ workspaceRoot: root, resolvedPath: resolved, workspaceWritable: false })).toBe(false);
+    expect(
+      isWriteAllowed({
+        workspaceRoot: root,
+        resolvedPath: resolved,
+        workspaceWritable: true,
+        workspaceSensitive: true,
+        allowSensitiveWrite: false,
+        confirmed: true,
+      }),
+    ).toBe(false);
+    expect(
+      isWriteAllowed({
+        workspaceRoot: root,
+        resolvedPath: resolved,
+        workspaceWritable: true,
+        workspaceSensitive: true,
+        allowSensitiveWrite: true,
+        confirmed: false,
+      }),
+    ).toBe(false);
+    expect(
+      isWriteAllowed({
+        workspaceRoot: root,
+        resolvedPath: resolved,
+        workspaceWritable: true,
+        workspaceSensitive: true,
+        allowSensitiveWrite: true,
+        confirmed: true,
+      }),
+    ).toBe(true);
+    expect(() =>
+      assertWriteAllowed({ workspaceRoot: root, resolvedPath: resolved, workspaceWritable: false }),
+    ).toThrow(/Writing/);
+  });
+
+  it("redacts sensitive paths for logs", () => {
+    expect(redactPathForLog("/data/ha_codex_ui/.codex/auth.json")).toBe("[sensitive-path]");
+    expect(redactPathForLog(path.join(root, "sub", "normal.yaml"))).toContain("normal.yaml");
+  });
+
   it("prevents zip-slip archive paths", () => {
     expect(() => sanitizeArchivePath("../escape.txt")).toThrow(/Archive path/);
     expect(() => sanitizeArchivePath("safe/../../escape.txt")).toThrow(/Archive path/);
+    expect(() => sanitizeArchivePath("")).toThrow(/Archive path/);
+    expect(sanitizeArchivePath("/safe/file.txt")).toBe("safe/file.txt");
     expect(sanitizeArchivePath("safe/file.txt")).toBe("safe/file.txt");
   });
 });
