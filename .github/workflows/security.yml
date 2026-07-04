@@ -66,8 +66,14 @@ jobs:
           version: v0.72.0
       - uses: github/codeql-action/upload-sarif@v3
         if: ${{ always() && hashFiles('trivy-fs.sarif') != '' }}
+        continue-on-error: true
         with:
           sarif_file: trivy-fs.sarif
+      - uses: actions/upload-artifact@v4
+        if: ${{ always() && hashFiles('trivy-fs.sarif') != '' }}
+        with:
+          name: trivy-filesystem-sarif
+          path: trivy-fs.sarif
   codeql:
     runs-on: ubuntu-latest
     steps:
@@ -77,3 +83,13 @@ jobs:
           languages: javascript-typescript
           config-file: ./.github/codeql/codeql-config.yml
       - uses: github/codeql-action/analyze@v3
+        continue-on-error: true
+        with:
+          output: codeql-results
+          upload: false
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: codeql-results
+          path: codeql-results
+          if-no-files-found: ignore
