@@ -45,7 +45,10 @@ jobs:
       - name: markdownlint
         run: |
           npm install -g markdownlint-cli2
-          markdownlint-cli2 "**/*.md"
+          mapfile -d '' -t md_files < <(find . -type f -name '*.md' -not -path '*/.git/*' -not -path '*/node_modules/*' -print0)
+          if (( ${#md_files[@]} > 0 )); then
+            markdownlint-cli2 "${md_files[@]}"
+          fi
       - name: Backend npm audit
         working-directory: ha_codex_ui/backend
         run: |

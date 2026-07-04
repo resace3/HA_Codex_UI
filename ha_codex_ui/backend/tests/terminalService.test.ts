@@ -28,7 +28,7 @@ describe("TerminalService", () => {
   });
 
   it("creates a shell PTY", async () => {
-    const terminal = await service.create({ type: "shell", workspaceId: "test", command: "printf ready" }, workspace, true);
+    const terminal = await service.create({ type: "shell", workspaceId: "test" }, workspace, true);
     expect(terminal.status).toBe("running");
   });
 
