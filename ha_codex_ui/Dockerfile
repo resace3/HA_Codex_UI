@@ -49,11 +49,15 @@ RUN apt-get update \
     zip \
   && rm -rf /var/lib/apt/lists/*
 
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
 RUN if [ "${CODEX_STUB}" = "1" ]; then \
       printf '%s\n' '#!/usr/bin/env bash' 'echo "Codex stub ready"' > /usr/local/bin/codex \
       && chmod 0755 /usr/local/bin/codex; \
     else \
-      npm install -g @openai/codex \
+      mkdir -p "${HOME}" \
+      && curl -fsSL https://chatgpt.com/codex/install.sh | CODEX_NON_INTERACTIVE=1 sh \
+      && if ! command -v codex >/dev/null 2>&1 && [ -x "${HOME}/.local/bin/codex" ]; then ln -s "${HOME}/.local/bin/codex" /usr/local/bin/codex; fi \
       && codex --version; \
     fi
 
