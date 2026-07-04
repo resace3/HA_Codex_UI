@@ -33,7 +33,7 @@ jobs:
           set -euo pipefail
           grep -F "execution is intentionally delegated to GitHub Actions" README.md
           grep -F "Do not run tests, builds, Docker, devcontainers, package installers, or generated scripts locally" AGENTS.md
-          if grep -R "act " .github README.md AGENTS.md SECURITY.md config_pilot/DOCS.md config_pilot/README.md; then
+          if grep -RInE 'nektos/act|(^|[[:space:]])act[[:space:]-]' .github README.md AGENTS.md SECURITY.md config_pilot/DOCS.md config_pilot/README.md | grep -v '.github/workflows/actions-remote-only.yml'; then
             echo "Found unsupported local Actions runner reference."
             exit 1
           fi
