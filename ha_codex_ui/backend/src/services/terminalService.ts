@@ -92,20 +92,32 @@ export class TerminalService {
       cols: 120,
       rows: 30,
     };
-    const pty = await this.getNodePty();
-    const command = this.commandFor(request);
-    const ptyProcess = pty.spawn(command.command, command.args, {
-      name: "xterm-256color",
-      cwd: workspace.root,
-      cols: model.cols,
-      rows: model.rows,
-      env: {
-        ...process.env,
-        HOME: this.options.app_data_dir,
-        CODEX_HOME: this.options.codex_home || DEFAULT_CODEX_HOME,
-        HA_CODEX_UI_WORKSPACE: workspace.root,
-      },
-    });
+    let ptyProcess: TerminalMessageBus;
+    try {
+      const pty = await this.getNodePty();
+      const command = this.commandFor(request);
+      ptyProcess = pty.spawn(command.command, command.args, {
+        name: "xterm-256color",
+        cwd: workspace.root,
+        cols: model.cols,
+        rows: model.rows,
+        env: {
+          ...process.env,
+          HOME: this.options.app_data_dir,
+          CODEX_HOME: this.options.codex_home || DEFAULT_CODEX_HOME,
+          HA_CODEX_UI_WORKSPACE: workspace.root,
+        },
+      });
+    } catch (error) {
+      if (error instanceof SafeError) {
+        throw error;
+      }
+      throw new SafeError(
+        "TERMINAL_PTY_UNAVAILABLE",
+        "The terminal backend is unavailable in this image. Update or rebuild the add-on.",
+        503,
+      );
+    }
     const session: Session = { model, ptyProcess, clients: new Set() };
     this.sessions.set(id, session);
     ptyProcess.onData((data) => {

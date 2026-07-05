@@ -40,24 +40,33 @@ export function defaultOptions(): AddonOptions {
 }
 
 export function loadAddonOptions(optionsPath = process.env.HA_CODEX_UI_OPTIONS ?? "/data/options.json"): AddonOptions {
-  if (!fs.existsSync(optionsPath)) {
-    return defaultOptions();
+  const fallbackPaths = [
+    optionsPath,
+    "/tmp/ha-codex-ui/options.json",
+    "/data/ha-codex-ui-options.json",
+    "/data/options.json",
+  ];
+  for (const candidate of fallbackPaths) {
+    try {
+      if (!fs.existsSync(candidate) || !fs.statSync(candidate).isFile()) {
+        continue;
+      }
+      const raw = fs.readFileSync(candidate, "utf8");
+      const parsed = JSON.parse(raw) as unknown;
+      const options = optionsSchema.parse(parsed);
+      return {
+        ...options,
+        default_workspace: path.resolve(options.default_workspace),
+        upload_workspace: path.resolve(options.upload_workspace),
+        allowed_workspaces: options.allowed_workspaces.map((workspace) => path.resolve(workspace)),
+        codex_home: path.resolve(options.codex_home),
+        app_data_dir: path.resolve(options.app_data_dir),
+      };
+    } catch {
+      continue;
+    }
   }
-  try {
-    const raw = fs.readFileSync(optionsPath, "utf8");
-    const parsed = JSON.parse(raw) as unknown;
-    const options = optionsSchema.parse(parsed);
-    return {
-      ...options,
-      default_workspace: path.resolve(options.default_workspace),
-      upload_workspace: path.resolve(options.upload_workspace),
-      allowed_workspaces: options.allowed_workspaces.map((workspace) => path.resolve(workspace)),
-      codex_home: path.resolve(options.codex_home),
-      app_data_dir: path.resolve(options.app_data_dir),
-    };
-  } catch {
-    return defaultOptions();
-  }
+  return defaultOptions();
 }
 
 export function optionsSchemaJson(): unknown {

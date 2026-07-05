@@ -38,7 +38,6 @@ ENV NODE_ENV=production \
   HA_CODEX_UI_DATA=/data/ha_codex_ui \
   CODEX_HOME=/data/ha_codex_ui/.codex \
   HOME=/data/ha_codex_ui \
-  NODE_OPTIONS=--openssl-config=/dev/null \
   OPENSSL_CONF=/tmp/ha-codex-ui/openssl.cnf
 
 RUN apt-get update \
@@ -79,17 +78,15 @@ COPY --from=backend-build /build/backend/dist ./backend/dist
 COPY --from=backend-build /build/backend/node_modules ./backend/node_modules
 COPY --from=backend-build /build/backend/package.json ./backend/package.json
 COPY --from=frontend-build /build/frontend/dist ./frontend
-COPY run.sh /run.sh
+COPY run.sh /opt/ha-codex-ui/run.sh
 
 RUN mkdir -p /data/ha_codex_ui/.codex /data/ha_codex_ui/sessions /data/ha_codex_ui/snapshots /share/ha_codex_ui_workspace /share/ha_codex_ui_uploads \
   && chmod 0700 /data/ha_codex_ui/.codex \
-  && chmod 0777 /run.sh \
+  && chmod 0755 /opt/ha-codex-ui/run.sh \
   && if [ ! -f /opt/ha-codex-ui/backend/node_modules/node-pty/build/Release/pty.node ]; then \
        cd /opt/ha-codex-ui/backend \
        && npm rebuild node-pty --build-from-source; \
      fi
 
-ENV OPENSSL_CONF=/dev/null
-
 EXPOSE 8107
-ENTRYPOINT ["/bin/bash", "/run.sh"]
+ENTRYPOINT ["/bin/bash", "/opt/ha-codex-ui/run.sh"]
