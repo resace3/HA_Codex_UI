@@ -102,4 +102,11 @@ ENTRYPOINT ["/bin/bash", "-lc", "set -euo pipefail; \
   echo \"Codex home: ${CODEX_HOME_DIR}\"; \
   echo \"Log level: ${LOG_LEVEL}\"; \
   echo \"Secrets and auth file contents are not printed.\"; \
+  if [ -f /tmp/ha-codex-ui/openssl.cnf ]; then \
+    export OPENSSL_CONF=/tmp/ha-codex-ui/openssl.cnf; \
+  elif [ -f /etc/ssl/openssl.cnf ]; then \
+    export OPENSSL_CONF=/etc/ssl/openssl.cnf; \
+  else \
+    export OPENSSL_CONF=/dev/null; \
+  fi; \
   exec node /opt/ha-codex-ui/backend/dist/index.js"]
