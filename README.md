@@ -48,10 +48,10 @@ Browser rendering workflows also upload screenshots and traces as GitHub Actions
 
 1. Push this repository to the public GitHub repository `resace3/HA_Codex_UI`.
 2. Click the install button above, or add the repository URL in the Home Assistant add-on store.
-4. Install **HA_Codex_UI**.
-5. Review add-on options.
-6. Start the add-on.
-7. Open **HA_Codex_UI** from the Home Assistant sidebar.
+3. Install **HA_Codex_UI**.
+4. Review add-on options.
+5. Start the add-on.
+6. Open **HA_Codex_UI** from the Home Assistant sidebar.
 
 Repository URL:
 
