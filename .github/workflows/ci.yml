@@ -20,12 +20,12 @@ jobs:
   repository-validation:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - run: python3 scripts/validate-addon-metadata.py
   remote-only:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - run: bash scripts/assert-github-actions-only.sh
       - run: |
           required='if [ "${GITHUB_ACTIONS:-}" != "true" ]; then'
@@ -35,13 +35,13 @@ jobs:
   name-collision:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - run: bash scripts/check-name-collisions.sh
   addon-validation:
     needs: [repository-validation, remote-only, name-collision]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - run: python3 scripts/validate-addon-metadata.py
       - run: bash scripts/check-ingress-paths.sh
       - run: bash scripts/check-websocket-proxy.sh
@@ -52,7 +52,7 @@ jobs:
       run:
         working-directory: ha_codex_ui/backend
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
@@ -68,7 +68,7 @@ jobs:
       run:
         working-directory: ha_codex_ui/frontend
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
@@ -85,7 +85,7 @@ jobs:
       run:
         working-directory: ha_codex_ui/backend
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
@@ -99,7 +99,7 @@ jobs:
       run:
         working-directory: ha_codex_ui/backend
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
