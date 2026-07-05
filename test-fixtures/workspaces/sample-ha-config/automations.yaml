@@ -1,3 +1,4 @@
+---
 - id: ha_codex_ui_fixture_light
   alias: HA_Codex_UI fixture automation
   trigger:

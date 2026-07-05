@@ -1,3 +1,4 @@
+---
 name: HA_Codex_UI
 slug: ha_codex_ui
 description: Run Codex CLI, manage files, and inspect changes from Home Assistant.

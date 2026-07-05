@@ -1,3 +1,4 @@
+---
 name: Home Assistant Local Install Smoke
 
 on:
@@ -35,7 +36,9 @@ jobs:
           echo "### Home Assistant local install smoke" >> "$GITHUB_STEP_SUMMARY"
           if [ -n "${HA_INSTANCE_URL:-}" ] && [ -n "${HA_TOKEN:-}" ]; then
             echo "Supervisor API endpoint/token were provided." >> "$GITHUB_STEP_SUMMARY"
-            echo "The workflow attempted repository registration and add-on installation in Supervisor." >> "$GITHUB_STEP_SUMMARY"
+            echo "The workflow attempted repository registration and" >> "$GITHUB_STEP_SUMMARY"
+            echo "add-on installation in Supervisor." >> "$GITHUB_STEP_SUMMARY"
           else
-            echo "No HA_INSTANCE_URL / HA_TOKEN secret pair was provided. Full Supervisor install remained a skipped diagnostic." >> "$GITHUB_STEP_SUMMARY"
+            echo "No HA_INSTANCE_URL / HA_TOKEN secret pair was provided." >> "$GITHUB_STEP_SUMMARY"
+            echo "Full Supervisor install remained a skipped diagnostic." >> "$GITHUB_STEP_SUMMARY"
           fi

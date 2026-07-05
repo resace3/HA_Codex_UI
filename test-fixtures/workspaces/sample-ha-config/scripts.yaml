@@ -1,3 +1,4 @@
+---
 ha_codex_ui_fixture:
   alias: HA_Codex_UI fixture script
   sequence:
