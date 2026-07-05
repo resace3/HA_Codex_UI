@@ -1,3 +1,4 @@
+---
 name: HA_Codex_UI CodeQL
 paths:
   - ha_codex_ui/backend/src

@@ -86,6 +86,7 @@ If you provide these repository secrets, CI can attempt a real Supervisor instal
 | `HA_TOKEN` | Long-lived Home Assistant token with permission to manage add-ons |
 
 When both are set, the workflow calls the Home Assistant CLI inside GitHub Actions to:
+
 1. Add the repository `https://github.com/resace3/HA_Codex_UI`.
 2. Install `ha_codex_ui`.
 3. Verify add-on visibility from CLI.
