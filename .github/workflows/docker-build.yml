@@ -19,6 +19,8 @@ concurrency:
 jobs:
   docker:
     runs-on: ubuntu-latest
+    env:
+      SMOKE_IMAGE_TAG: ghcr.io/resace3/ha-codex-ui:ci
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-buildx-action@v3
@@ -26,19 +28,22 @@ jobs:
         run: |
           docker buildx build --load --platform linux/amd64 \
             --build-arg CODEX_STUB=1 \
-            -t ghcr.io/resace3/ha-codex-ui:ci \
+            -t ${{ env.SMOKE_IMAGE_TAG }} \
             -f ha_codex_ui/Dockerfile ha_codex_ui
       - name: Docker smoke
+        env:
+          SMOKE_IMAGE_TAG: ${{ env.SMOKE_IMAGE_TAG }}
+          SMOKE_SKIP_BUILD: 1
         run: bash scripts/smoke-docker-image.sh
       - name: Trivy image scan
         uses: aquasecurity/trivy-action@v0.36.0
         with:
-          image-ref: ghcr.io/resace3/ha-codex-ui:ci-smoke
+          image-ref: ${{ env.SMOKE_IMAGE_TAG }}
           format: sarif
           output: trivy-image.sarif
           version: v0.72.0
       - uses: github/codeql-action/upload-sarif@v3
-        if: always()
+        if: always() && hashFiles('trivy-image.sarif') != ''
         continue-on-error: true
         with:
           sarif_file: trivy-image.sarif

@@ -88,13 +88,13 @@ COPY --from=backend-build /build/backend/node_modules ./backend/node_modules
 COPY --from=backend-build /build/backend/package.json ./backend/package.json
 COPY --from=frontend-build /build/frontend/dist ./frontend
 COPY run.sh /opt/ha-codex-ui/run.sh
+WORKDIR /opt/ha-codex-ui/backend
 
 RUN mkdir -p /data/ha_codex_ui/.codex /data/ha_codex_ui/sessions /data/ha_codex_ui/snapshots /share/ha_codex_ui_workspace /share/ha_codex_ui_uploads \
   && chmod 0700 /data/ha_codex_ui/.codex \
   && chmod 0755 /opt/ha-codex-ui/run.sh \
   && if [ ! -f /opt/ha-codex-ui/backend/node_modules/node-pty/build/Release/pty.node ]; then \
-       cd /opt/ha-codex-ui/backend \
-       && npm rebuild node-pty --build-from-source; \
+       npm rebuild node-pty --build-from-source; \
      fi
 
 EXPOSE 8107
