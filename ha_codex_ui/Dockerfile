@@ -17,7 +17,11 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/*
 COPY backend/package.json backend/package-lock.json ./
 RUN npm install --package-lock-only && npm ci --include=dev \
-  && npm rebuild node-pty --build-from-source
+  && npm rebuild node-pty --build-from-source \
+  && if [ ! -f node_modules/node-pty/build/Release/pty.node ]; then \
+      echo "Expected node-pty native module not found after build."; \
+      exit 1; \
+    fi
 COPY backend/ ./
 RUN npm run build && npm prune --omit=dev
 
@@ -45,6 +49,8 @@ RUN apt-get update \
     gzip \
     jq \
     openssh-client \
+    make \
+    g++ \
     python3 \
     tar \
     unzip \
@@ -71,11 +77,17 @@ COPY --from=backend-build /build/backend/dist ./backend/dist
 COPY --from=backend-build /build/backend/node_modules ./backend/node_modules
 COPY --from=backend-build /build/backend/package.json ./backend/package.json
 COPY --from=frontend-build /build/frontend/dist ./frontend
-COPY run.sh /run.sh
+COPY --chmod=0755 run.sh /run.sh
 
 RUN mkdir -p /data/ha_codex_ui/.codex /data/ha_codex_ui/sessions /data/ha_codex_ui/snapshots /share/ha_codex_ui_workspace /share/ha_codex_ui_uploads \
   && chmod 0700 /data/ha_codex_ui/.codex \
-  && chmod 0755 /run.sh
+  && chmod 0755 /run.sh \
+  && if [ ! -f /opt/ha-codex-ui/backend/node_modules/node-pty/build/Release/pty.node ]; then \
+       cd /opt/ha-codex-ui/backend \
+       && npm rebuild node-pty --build-from-source; \
+     fi
+
+ENV OPENSSL_CONF=/dev/null
 
 EXPOSE 8107
 ENTRYPOINT ["/bin/bash", "/run.sh"]

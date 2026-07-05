@@ -1,7 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
-import * as pty from "node-pty";
 import type WebSocket from "ws";
 import type { AddonOptions } from "../config/addonOptions.js";
 import { DEFAULT_CODEX_HOME } from "../config/paths.js";
@@ -18,12 +17,24 @@ import type {
 import type { Workspace } from "../types/workspace.js";
 import { ensureDir } from "../utils/fs.js";
 
+type TerminalMessageBus = {
+  onData: (listener: (data: string) => void) => void;
+  onExit: (listener: (payload: { exitCode: number }) => void) => void;
+  write: (data: string) => void;
+  resize: (cols: number, rows: number) => void;
+  kill: () => void;
+};
+
+type NodePtyModule = typeof import("node-pty");
+
 type Session = {
   model: TerminalModel;
-  ptyProcess: pty.IPty | null;
+  ptyProcess: TerminalMessageBus | null;
   clients: Set<WebSocket>;
   idleTimer?: NodeJS.Timeout;
 };
+
+let nodePty: NodePtyModule | null = null;
 
 export class TerminalService {
   private readonly sessions = new Map<string, Session>();
@@ -81,6 +92,7 @@ export class TerminalService {
       cols: 120,
       rows: 30,
     };
+    const pty = await this.getNodePty();
     const command = this.commandFor(request);
     const ptyProcess = pty.spawn(command.command, command.args, {
       name: "xterm-256color",
@@ -247,6 +259,23 @@ export class TerminalService {
     }
     await ensureDir(path.join(this.options.app_data_dir, "sessions"));
     await fs.promises.writeFile(this.metadataPath(model.id), JSON.stringify(model, null, 2), "utf8");
+  }
+
+  private async getNodePty(): Promise<NodePtyModule> {
+    if (nodePty) {
+      return nodePty;
+    }
+    try {
+      const imported = await import("node-pty");
+      nodePty = imported;
+      return imported;
+    } catch {
+      throw new SafeError(
+        "TERMINAL_PTY_UNAVAILABLE",
+        "The terminal backend module is unavailable in this image. Please check the add-on build and native PTY support.",
+        503,
+      );
+    }
   }
 
   private metadataPath(id: string): string {

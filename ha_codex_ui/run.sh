@@ -28,10 +28,10 @@ echo "Upload workspace: ${UPLOAD_WORKSPACE}"
 echo "Codex home: ${CODEX_HOME_DIR}"
 echo "Log level: ${LOG_LEVEL}"
 echo "Secrets and auth file contents are not printed."
+
+export OPENSSL_CONF="/dev/null"
 if [ -r /tmp/ha-codex-ui/openssl.cnf ]; then
   export OPENSSL_CONF=/tmp/ha-codex-ui/openssl.cnf
-else
-  export OPENSSL_CONF=/dev/null
 fi
 
 exec node /opt/ha-codex-ui/backend/dist/index.js
