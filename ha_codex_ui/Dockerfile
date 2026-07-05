@@ -16,7 +16,8 @@ RUN apt-get update \
     python3 \
   && rm -rf /var/lib/apt/lists/*
 COPY backend/package.json backend/package-lock.json ./
-RUN npm install --package-lock-only && npm ci
+RUN npm install --package-lock-only && npm ci --include=dev \
+  && npm rebuild node-pty --build-from-source
 COPY backend/ ./
 RUN npm run build && npm prune --omit=dev
 
@@ -61,7 +62,7 @@ RUN if [ "${CODEX_STUB}" = "1" ]; then \
       && if ! command -v codex >/dev/null 2>&1 && [ -x "${HOME}/.local/bin/codex" ]; then ln -s "${HOME}/.local/bin/codex" /usr/local/bin/codex; fi \
       && codex --version; \
     fi
-RUN if [ -f /etc/ssl/openssl.cnf ]; then \
+RUN if [ -r /etc/ssl/openssl.cnf ]; then \
       mkdir -p /tmp/ha-codex-ui && cp -f /etc/ssl/openssl.cnf /tmp/ha-codex-ui/openssl.cnf; \
     fi
 
@@ -102,10 +103,8 @@ ENTRYPOINT ["/bin/bash", "-lc", "set -euo pipefail; \
   echo \"Codex home: ${CODEX_HOME_DIR}\"; \
   echo \"Log level: ${LOG_LEVEL}\"; \
   echo \"Secrets and auth file contents are not printed.\"; \
-  if [ -f /tmp/ha-codex-ui/openssl.cnf ]; then \
+  if [ -r /tmp/ha-codex-ui/openssl.cnf ]; then \
     export OPENSSL_CONF=/tmp/ha-codex-ui/openssl.cnf; \
-  elif [ -f /etc/ssl/openssl.cnf ]; then \
-    export OPENSSL_CONF=/etc/ssl/openssl.cnf; \
   else \
     export OPENSSL_CONF=/dev/null; \
   fi; \
