@@ -73,4 +73,4 @@ RUN mkdir -p /data/ha_codex_ui/.codex /data/ha_codex_ui/sessions /data/ha_codex_
   && chmod 0755 /run.sh
 
 EXPOSE 8107
-ENTRYPOINT ["/run.sh"]
+ENTRYPOINT ["/bin/bash", "/run.sh"]
