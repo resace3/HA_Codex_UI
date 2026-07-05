@@ -34,7 +34,6 @@ export async function commandExists(command: string): Promise<string | null> {
     }
   }
 }
-}
 
 export async function safeExecFile(command: string, args: string[], cwd?: string): Promise<{ stdout: string; stderr: string; code: number }> {
   try {
