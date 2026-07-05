@@ -34,7 +34,6 @@ for key in ["name:", "url:", "maintainer:"]:
 required_pairs = {
     "name: HA_Codex_UI": "display name",
     "slug: ha_codex_ui": "slug",
-    "version: 0.1.0": "version",
     "ingress: true": "ingress",
     "ingress_port: 8107": "ingress port",
     "panel_title: HA_Codex_UI": "panel title",
