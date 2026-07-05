@@ -6,7 +6,9 @@ OPTIONS_FILE="/tmp/ha-codex-ui/options.json"
 
 mkdir -p /tmp/ha-codex-ui
 if [ -r "${OPTIONS_SOURCE}" ]; then
-  cp "${OPTIONS_SOURCE}" "${OPTIONS_FILE}"
+  if ! cp "${OPTIONS_SOURCE}" "${OPTIONS_FILE}" 2>/dev/null; then
+    printf '%s\n' "{}" >"${OPTIONS_FILE}"
+  fi
 else
   printf '%s\n' "{}" >"${OPTIONS_FILE}"
 fi
