@@ -79,7 +79,7 @@ COPY --from=backend-build /build/backend/dist ./backend/dist
 COPY --from=backend-build /build/backend/node_modules ./backend/node_modules
 COPY --from=backend-build /build/backend/package.json ./backend/package.json
 COPY --from=frontend-build /build/frontend/dist ./frontend
-COPY --chmod=0755 run.sh /run.sh
+COPY run.sh /run.sh
 
 RUN mkdir -p /data/ha_codex_ui/.codex /data/ha_codex_ui/sessions /data/ha_codex_ui/snapshots /share/ha_codex_ui_workspace /share/ha_codex_ui_uploads \
   && chmod 0700 /data/ha_codex_ui/.codex \

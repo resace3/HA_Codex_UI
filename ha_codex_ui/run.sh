@@ -33,5 +33,6 @@ export OPENSSL_CONF="/dev/null"
 if [ -r /tmp/ha-codex-ui/openssl.cnf ]; then
   export OPENSSL_CONF=/tmp/ha-codex-ui/openssl.cnf
 fi
+export NODE_OPTIONS="--openssl-config=${OPENSSL_CONF}"
 
 exec node /opt/ha-codex-ui/backend/dist/index.js
