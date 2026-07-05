@@ -16,6 +16,11 @@ concurrency:
 jobs:
   devcontainer:
     runs-on: ubuntu-latest
+    env:
+      HA_INSTANCE_URL: ${{ secrets.HA_INSTANCE_URL }}
+      HA_TOKEN: ${{ secrets.HA_TOKEN }}
+      HA_REPO_URL: https://github.com/resace3/HA_Codex_UI
+      HA_ADDON_SLUG: ha_codex_ui
     steps:
       - uses: actions/checkout@v4
       - name: Build and run devcontainer

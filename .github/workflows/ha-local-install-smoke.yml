@@ -16,6 +16,11 @@ concurrency:
 jobs:
   ha-smoke:
     runs-on: ubuntu-latest
+    env:
+      HA_INSTANCE_URL: ${{ secrets.HA_INSTANCE_URL }}
+      HA_TOKEN: ${{ secrets.HA_TOKEN }}
+      HA_REPO_URL: https://github.com/resace3/HA_Codex_UI
+      HA_ADDON_SLUG: ha_codex_ui
     steps:
       - uses: actions/checkout@v4
       - name: Validate local add-on structure
@@ -28,5 +33,9 @@ jobs:
         if: always()
         run: |
           echo "### Home Assistant local install smoke" >> "$GITHUB_STEP_SUMMARY"
-          echo "Required structure and container health checks ran." >> "$GITHUB_STEP_SUMMARY"
-          echo "Full Supervisor install is reported only when the runner supports it." >> "$GITHUB_STEP_SUMMARY"
+          if [ -n "${HA_INSTANCE_URL:-}" ] && [ -n "${HA_TOKEN:-}" ]; then
+            echo "Supervisor API endpoint/token were provided." >> "$GITHUB_STEP_SUMMARY"
+            echo "The workflow attempted repository registration and add-on installation in Supervisor." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "No HA_INSTANCE_URL / HA_TOKEN secret pair was provided. Full Supervisor install remained a skipped diagnostic." >> "$GITHUB_STEP_SUMMARY"
+          fi

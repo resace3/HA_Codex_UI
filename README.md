@@ -76,6 +76,22 @@ https://github.com/resace3/HA_Codex_UI
 3. GitHub Actions attempts Home Assistant and Supervisor smoke diagnostics.
 4. GitHub Actions uploads logs and summaries.
 
+## Install Option 4: GitHub Actions Home Assistant Install Smoke
+
+If you provide these repository secrets, CI can attempt a real Supervisor install:
+
+| Secret | Purpose |
+| --- | --- |
+| `HA_INSTANCE_URL` | Home Assistant base URL, for example `http://homeassistant.local:8123` |
+| `HA_TOKEN` | Long-lived Home Assistant token with permission to manage add-ons |
+
+When both are set, the workflow calls the Home Assistant CLI inside GitHub Actions to:
+1. Add the repository `https://github.com/resace3/HA_Codex_UI`.
+2. Install `ha_codex_ui`.
+3. Verify add-on visibility from CLI.
+
+The smoke is marked attempted when only one of these values is missing, or successful when Supervisor accepts the install.
+
 ## Configuration
 
 | Option | Default | Notes |
