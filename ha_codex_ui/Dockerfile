@@ -32,7 +32,8 @@ ENV NODE_ENV=production \
   PORT=8107 \
   HA_CODEX_UI_DATA=/data/ha_codex_ui \
   CODEX_HOME=/data/ha_codex_ui/.codex \
-  HOME=/data/ha_codex_ui
+  HOME=/data/ha_codex_ui \
+  OPENSSL_CONF=/tmp/ha-codex-ui/openssl.cnf
 
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
@@ -59,6 +60,9 @@ RUN if [ "${CODEX_STUB}" = "1" ]; then \
       && curl -fsSL https://chatgpt.com/codex/install.sh | CODEX_NON_INTERACTIVE=1 sh \
       && if ! command -v codex >/dev/null 2>&1 && [ -x "${HOME}/.local/bin/codex" ]; then ln -s "${HOME}/.local/bin/codex" /usr/local/bin/codex; fi \
       && codex --version; \
+    fi
+RUN if [ -f /etc/ssl/openssl.cnf ]; then \
+      mkdir -p /tmp/ha-codex-ui && cp -f /etc/ssl/openssl.cnf /tmp/ha-codex-ui/openssl.cnf; \
     fi
 
 WORKDIR /opt/ha-codex-ui
