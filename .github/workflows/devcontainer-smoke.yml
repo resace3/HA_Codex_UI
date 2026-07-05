@@ -23,7 +23,7 @@ jobs:
       HA_REPO_URL: https://github.com/resace3/HA_Codex_UI
       HA_ADDON_SLUG: ha_codex_ui
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Build and run devcontainer
         uses: devcontainers/ci@v0.3
         with:

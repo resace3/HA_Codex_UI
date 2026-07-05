@@ -23,7 +23,7 @@ jobs:
       HA_CODEX_UI_FRONTEND_DIR: "/tmp/ha-codex-ui-e2e/frontend"
       PORT: "8107"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
