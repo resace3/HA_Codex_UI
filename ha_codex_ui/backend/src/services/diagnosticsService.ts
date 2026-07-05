@@ -135,6 +135,22 @@ export class DiagnosticsService {
     const debugAvailable = await pathExists(debugPath);
     const prebuildAvailable = await pathExists(prebuildPath);
     if (releaseAvailable || debugAvailable || prebuildAvailable) {
+      try {
+        const imported = await import("node-pty");
+        const candidate = (imported as { spawn?: unknown; default?: { spawn?: unknown } } | unknown) as {
+          spawn?: unknown;
+          default?: { spawn?: unknown };
+        };
+        if (typeof candidate.spawn !== "function" && typeof candidate.default?.spawn !== "function") {
+          return warn(
+            "node-pty",
+            "PTY support",
+            "node-pty module is present but did not expose a loadable spawn API.",
+          );
+        }
+      } catch {
+        return warn("node-pty", "PTY support", "node-pty module file exists but could not be loaded.");
+      }
       return pass("node-pty", "PTY support", "node-pty native module appears available.");
     }
     return warn("node-pty", "PTY support", "node-pty native module was not found. Terminal PTY features may be unavailable.");

@@ -1,3 +1,6 @@
+import { access } from "node:fs/promises";
+import { constants } from "node:fs";
+import path from "node:path";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 
@@ -12,9 +15,25 @@ export async function commandExists(command: string): Promise<string | null> {
       const { stdout } = await execFileAsync("which", [command]);
       return stdout.trim() || null;
     } catch {
+      const searchRoots = [
+        process.env.HOME,
+        "/usr/local/bin",
+        "/usr/bin",
+        "/bin",
+      ].filter((value): value is string => typeof value === "string" && value.length > 0);
+      for (const root of searchRoots) {
+        const fullPath = path.join(root, command);
+        try {
+          await access(fullPath, constants.X_OK);
+          return fullPath;
+        } catch {
+          // continue
+        }
+      }
       return null;
     }
   }
+}
 }
 
 export async function safeExecFile(command: string, args: string[], cwd?: string): Promise<{ stdout: string; stderr: string; code: number }> {

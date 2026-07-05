@@ -290,9 +290,25 @@ export class TerminalService {
       return nodePty;
     }
     try {
-      const imported = await import("node-pty");
-      nodePty = imported;
-      return imported;
+      const imported = (await import("node-pty")) as NodePtyModule & { default?: NodePtyModule };
+      const resolved = (() => {
+        if ("spawn" in imported && typeof (imported as NodePtyModule).spawn === "function") {
+          return imported as NodePtyModule;
+        }
+        if (imported.default && typeof imported.default.spawn === "function") {
+          return imported.default;
+        }
+        return null;
+      })();
+      if (!resolved) {
+        throw new SafeError(
+          "TERMINAL_PTY_UNAVAILABLE",
+          "node-pty resolved but does not expose a valid spawn function.",
+          503,
+        );
+      }
+      nodePty = resolved;
+      return resolved;
     } catch {
       throw new SafeError(
         "TERMINAL_PTY_UNAVAILABLE",
