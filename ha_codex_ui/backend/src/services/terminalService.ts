@@ -25,7 +25,19 @@ type TerminalMessageBus = {
   kill: () => void;
 };
 
-type NodePtyModule = typeof import("node-pty");
+type NodePtyModule = {
+  spawn: (
+    command: string,
+    args: string[],
+    options: {
+      name: string;
+      cwd: string;
+      cols: number;
+      rows: number;
+      env: NodeJS.ProcessEnv;
+    },
+  ) => TerminalMessageBus;
+};
 
 type Session = {
   model: TerminalModel;
