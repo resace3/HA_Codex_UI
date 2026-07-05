@@ -18,7 +18,7 @@ profile ha-codex-ui flags=(attach_disconnected,mediate_deleted) {
   deny /var/run/docker.sock rwklx,
   deny /run/docker.sock rwklx,
 
-  /run.sh ix,
+  /run.sh rix,
   /bin/** rix,
   /usr/bin/** rix,
   /usr/local/bin/** rix,
