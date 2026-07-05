@@ -43,17 +43,21 @@ export function loadAddonOptions(optionsPath = process.env.HA_CODEX_UI_OPTIONS ?
   if (!fs.existsSync(optionsPath)) {
     return defaultOptions();
   }
-  const raw = fs.readFileSync(optionsPath, "utf8");
-  const parsed = JSON.parse(raw) as unknown;
-  const options = optionsSchema.parse(parsed);
-  return {
-    ...options,
-    default_workspace: path.resolve(options.default_workspace),
-    upload_workspace: path.resolve(options.upload_workspace),
-    allowed_workspaces: options.allowed_workspaces.map((workspace) => path.resolve(workspace)),
-    codex_home: path.resolve(options.codex_home),
-    app_data_dir: path.resolve(options.app_data_dir),
-  };
+  try {
+    const raw = fs.readFileSync(optionsPath, "utf8");
+    const parsed = JSON.parse(raw) as unknown;
+    const options = optionsSchema.parse(parsed);
+    return {
+      ...options,
+      default_workspace: path.resolve(options.default_workspace),
+      upload_workspace: path.resolve(options.upload_workspace),
+      allowed_workspaces: options.allowed_workspaces.map((workspace) => path.resolve(workspace)),
+      codex_home: path.resolve(options.codex_home),
+      app_data_dir: path.resolve(options.app_data_dir),
+    };
+  } catch {
+    return defaultOptions();
+  }
 }
 
 export function optionsSchemaJson(): unknown {

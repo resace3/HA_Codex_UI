@@ -123,12 +123,21 @@ export class DiagnosticsService {
   }
 
   private async checkPty(): Promise<DiagnosticCheck> {
-    try {
-      const imported = await import("node-pty");
-      return imported ? pass("node-pty", "PTY support", "node-pty module is available.") : warn("node-pty", "PTY support", "node-pty could not be loaded.");
-    } catch {
-      return warn("node-pty", "PTY support", "node-pty could not be loaded.");
+    const releasePath = path.join(process.cwd(), "backend/node_modules/node-pty/build/Release/pty.node");
+    const prebuildPath = path.join(
+      process.cwd(),
+      "backend/node_modules/node-pty/prebuilds",
+      `${process.platform}-${process.arch}`,
+      "pty.node",
+    );
+    const debugPath = path.join(process.cwd(), "backend/node_modules/node-pty/build/Debug/pty.node");
+    const releaseAvailable = await pathExists(releasePath);
+    const debugAvailable = await pathExists(debugPath);
+    const prebuildAvailable = await pathExists(prebuildPath);
+    if (releaseAvailable || debugAvailable || prebuildAvailable) {
+      return pass("node-pty", "PTY support", "node-pty native module appears available.");
     }
+    return warn("node-pty", "PTY support", "node-pty native module was not found. Terminal PTY features may be unavailable.");
   }
 }
 
