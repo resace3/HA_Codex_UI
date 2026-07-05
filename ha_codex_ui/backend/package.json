@@ -1,6 +1,6 @@
 {
   "name": "@resace3/ha-codex-ui-backend",
-  "version": "0.1.14",
+  "version": "0.1.15",
   "private": true,
   "type": "module",
   "main": "dist/index.js",

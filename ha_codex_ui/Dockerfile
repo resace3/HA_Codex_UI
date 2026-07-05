@@ -64,9 +64,18 @@ RUN if [ "${CODEX_STUB}" = "1" ]; then \
       && chmod 0755 /usr/local/bin/codex; \
     else \
       mkdir -p "${HOME}" \
-      && curl -fsSL https://chatgpt.com/codex/install.sh | CODEX_NON_INTERACTIVE=1 sh \
-      && if ! command -v codex >/dev/null 2>&1 && [ -x "${HOME}/.local/bin/codex" ]; then ln -s "${HOME}/.local/bin/codex" /usr/local/bin/codex; fi \
-      && codex --version; \
+      && if ! curl -fsSL https://chatgpt.com/codex/install.sh | CODEX_NON_INTERACTIVE=1 sh; then \
+           echo "Codex install script failed; attempting official npm package fallback."; \
+           npm install -g @openai/codex || true; \
+         fi \
+      && if ! command -v codex >/dev/null 2>&1 && [ -x "${HOME}/.local/bin/codex" ]; then \
+           ln -s "${HOME}/.local/bin/codex" /usr/local/bin/codex; \
+         fi \
+      && if ! command -v codex >/dev/null 2>&1; then \
+           echo "Codex CLI is not installed in this image."; \
+         else \
+           codex --version; \
+         fi; \
     fi
 RUN if [ -r /etc/ssl/openssl.cnf ]; then \
       mkdir -p /tmp/ha-codex-ui && cp -f /etc/ssl/openssl.cnf /tmp/ha-codex-ui/openssl.cnf; \

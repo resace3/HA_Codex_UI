@@ -1,5 +1,5 @@
 export const SERVICE_NAME = "ha-codex-ui";
-export const ADDON_VERSION = "0.1.14";
+export const ADDON_VERSION = "0.1.15";
 export const DEFAULT_PORT = 8107;
 export const DEFAULT_DATA_DIR = "/data/ha_codex_ui";
 export const DEFAULT_CODEX_HOME = "/data/ha_codex_ui/.codex";
