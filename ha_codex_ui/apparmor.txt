@@ -46,6 +46,7 @@ profile ha-codex-ui flags=(attach_disconnected,mediate_deleted) {
   /dev/pts/** rw,
   /dev/ptmx rw,
   /dev/tty rw,
+  /etc/ssl/** r,
   /proc/** r,
   /proc/*/fd/** rw,
   /proc/*/stat r,
